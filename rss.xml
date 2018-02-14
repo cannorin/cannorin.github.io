@@ -32,5 +32,18 @@
 
 </description>
     </item>
+    <item>
+      <title>F# で型クラス</title>
+      <guid>http://7colou.red//blog/2018/02-14-fsharp-typeclasses</guid>
+      <link>http://7colou.red//blog/2018/02-14-fsharp-typeclasses/index.html</link>
+      <pubDate>Tue, 13 Feb 2018 18:54:24 GMT</pubDate>
+      <description>&lt;p&gt;F# は OCaml を .NET に乗っけて色々足した言語だが、その過程で失ってしまったものもたくさんあり、
+その中でも特に痛いのは functor がないことだ。&lt;/p&gt;
+&lt;p&gt;そして F# には高階型も型クラスもないので、われわれは例の interface でなんとか生き延びざるを得ない……&lt;/p&gt;
+&lt;p&gt;……わけではない。&lt;/p&gt;
+
+
+</description>
+    </item>
   </channel>
 </rss>
