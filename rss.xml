@@ -4,6 +4,24 @@
     <link>http://7colou.red/</link>
     <description></description>
     <item>
+      <title>Tags</title>
+      <guid>http://7colou.red//blog/tag</guid>
+      <link>http://7colou.red//blog/tag/index.html</link>
+      <pubDate>Sun, 30 Dec 2300 15:00:00 GMT</pubDate>
+      <description>
+
+</description>
+    </item>
+    <item>
+      <title>Archive</title>
+      <guid>http://7colou.red//blog/archive</guid>
+      <link>http://7colou.red//blog/archive/index.html</link>
+      <pubDate>Sun, 30 Dec 2300 15:00:00 GMT</pubDate>
+      <description>
+
+</description>
+    </item>
+    <item>
       <title>FsBlog でブログ構築</title>
       <guid>http://7colou.red//blog/2018/02-14-f</guid>
       <link>http://7colou.red//blog/2018/02-14-f/index.html</link>
