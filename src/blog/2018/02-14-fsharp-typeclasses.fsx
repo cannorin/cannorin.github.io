@@ -54,7 +54,7 @@ type MonadBuiltin = MonadBuiltin with
 *)
 
 (**
-そして、`^Builtin` 型もしくはモナドになる型 `^Ma` から bind/return の実装を取り出すインライン関数 `getImpl` を定義する。
+そして、`^Builtin` 型もしくはコンテナ型 `^Ma` から bind/return の実装を取り出すインライン関数 `getImpl` を定義する。
 
 インライン関数では Statically Resolved Type Parameters (SRTP) を型パラメータに取ることができて、通常の型パラメータが `'T` と
 表記されるのに対して SRTP は `^T` と表記される。
