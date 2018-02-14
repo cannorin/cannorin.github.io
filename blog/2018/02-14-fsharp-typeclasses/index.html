@@ -102,7 +102,7 @@
 <p>ダミーの引数でコンテナ型を明示的に指定させるのは、 F# コンパイラがオーバーロードを自動で解決できるようにするため。</p>
 <p>たとえば引数を <code>unit</code> などにしてしまうと、どのオーバーロードを呼べば目的のコンテナ型に対する実装が手に入るのかが判断できなくなってしまう。</p>
 <p>このビルトイン実装は後ほど使う。</p>
-<p>そして、<code>^Builtin</code> 型もしくはモナドになる型 <code>^Ma</code> から bind/return の実装を取り出すインライン関数 <code>getImpl</code> を定義する。</p>
+<p>そして、<code>^Builtin</code> 型もしくはコンテナ型 <code>^Ma</code> から bind/return の実装を取り出すインライン関数 <code>getImpl</code> を定義する。</p>
 <p>インライン関数では Statically Resolved Type Parameters (SRTP) を型パラメータに取ることができて、通常の型パラメータが <code>'T</code> と
 表記されるのに対して SRTP は <code>^T</code> と表記される。</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
