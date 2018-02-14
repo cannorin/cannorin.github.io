@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>FsBlog でブログ構築</title>
+    <meta name="description" />
+    
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="alternate" href="http://7colou.red/rss.xml" title="SevenColoured" type="application/rss+xml">
+    <link rel="shortcut icon" href="http://7colou.red/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="http://7colou.red/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    <!-- FSharp.Formatting Styles -->
+    <link rel="stylesheet" type="text/css" media="screen" href="http://7colou.red/fsharp.formatting/tooltips.css" />
+    <script type="text/javascript" src="http://7colou.red/fsharp.formatting/tooltips.js"></script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+<body class="post-template nav-closed">
+
+    <div class="nav">
+        
+        <a class="subscribe-button icon-feed" href="http://7colou.red/rss.xml">Subscribe</a>
+    </div>
+    <span class="nav-cover"></span>
+
+    <div class="site-wrapper">
+
+        
+
+<header class="main-header post-head no-cover">
+    <nav class="main-nav clearfix">
+        <a class="nav-item" href="http://7colou.red">Home</a>
+        <a class="nav-item" href="http://7colou.red/blog/">Blog</a>
+        
+    </nav>
+</header>
+<main class="content" role="main">
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">FsBlog でブログ構築</h1>
+            <section class="post-meta">
+
+
+
+                <time class="post-date" datetime="2018-02-14T04:00:48">
+                  <a href="http://7colou.red/blog/archive/february-2018">2018/02/14 4:00:48</a>
+                </time>
+                <span class="tags"><strong>Tags: </strong>
+                        <a href="http://7colou.red/blog/tag/fsharp">F#</a>
+                        <a href="http://7colou.red/blog/tag/misc">misc</a>
+                </span>
+            </section>
+        </header>
+
+        <section class="post-content">
+          
+<p>ブログを作っては爆破することを加算無限回繰り返してきたけど今度は爆破しないよ</p>
+<p>もしもまた爆破したら木の下に埋めてもらっても構わないよ</p>
+<!--more-->
+<h2>FsBlog</h2>
+<hr />
+<p>Markdown とか F# とかでブログが書けるやつ、公式 repo は <a href="https://github.com/fsprojects/FsBlog">こちら</a></p>
+<p>導入方法は公式を見れば書いてあるのでよいとして、ハマった点がいくつか</p>
+<h3>F# スクリプト中に more 命令を入れてないとエラー吐いて死ぬ</h3>
+<hr />
+<p>F# スクリプトで <code>more</code> 命令 (<code>*</code> 3つでコメントアウトするやつ。続きを読む機能のために使う、というわけでもなさそうなので謎) が抜けてると容赦なく死にます</p>
+<p>Markdown ならなぜかなくても大丈夫っぽい</p>
+<h3>config.yml で output 先を直接 github pages などの repo にしてはいけない</h3>
+<hr />
+<p><code>./fake generate</code> 時に output 先のディレクトリの中身を全削除するので .git フォルダとかも消えちゃいます</p>
+<h2>sugoi</h2>
+<hr />
+<p>マウス乗っけるとシグネチャとか出るよすごくない？？</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="k">rec</span> <span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="f">ackermann</span> <span class="o">=</span> <span class="k">function</span>
+  | (<span class="n">0</span>, <span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">n</span>) <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs2', 3)" onmouseover="showTip(event, 'fs2', 3)" class="i">n</span> <span class="o">+</span> <span class="n">1</span>
+  | (<span onmouseout="hideTip(event, 'fs3', 4)" onmouseover="showTip(event, 'fs3', 4)" class="i">m</span>, <span class="n">0</span>) <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs1', 5)" onmouseover="showTip(event, 'fs1', 5)" class="f">ackermann</span> (<span onmouseout="hideTip(event, 'fs3', 6)" onmouseover="showTip(event, 'fs3', 6)" class="i">m</span> <span class="o">-</span> <span class="n">1</span>, <span class="n">1</span>)
+  | (<span onmouseout="hideTip(event, 'fs3', 7)" onmouseover="showTip(event, 'fs3', 7)" class="i">m</span>, <span onmouseout="hideTip(event, 'fs2', 8)" onmouseover="showTip(event, 'fs2', 8)" class="i">n</span>) <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs1', 9)" onmouseover="showTip(event, 'fs1', 9)" class="f">ackermann</span> (<span onmouseout="hideTip(event, 'fs3', 10)" onmouseover="showTip(event, 'fs3', 10)" class="i">m</span> <span class="o">-</span> <span class="n">1</span>, <span onmouseout="hideTip(event, 'fs1', 11)" onmouseover="showTip(event, 'fs1', 11)" class="f">ackermann</span> (<span onmouseout="hideTip(event, 'fs3', 12)" onmouseover="showTip(event, 'fs3', 12)" class="i">m</span>, <span onmouseout="hideTip(event, 'fs2', 13)" onmouseover="showTip(event, 'fs2', 13)" class="i">n</span> <span class="o">-</span> <span class="n">1</span>))
+
+<span onmouseout="hideTip(event, 'fs1', 14)" onmouseover="showTip(event, 'fs1', 14)" class="f">ackermann</span> (<span class="n">4</span>, <span class="n">2</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>LaTeX もいける、なぞ</p>
+<p><span class="math">\[  \frac{d}{dx}\left( \int_{0}^{x} f(u)\,du\right)=f(x).\]</span></p>
+
+<div class="tip" id="fs1">val ackermann : int * int -&gt; int<br /><br />Full name: f.ackermann</div>
+<div class="tip" id="fs2">val n : int</div>
+<div class="tip" id="fs3">val m : int</div>
+
+        </section>
+
+        <footer class="post-footer">
+
+            
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=FsBlog でブログ構築 -"
+                    onclick="window.open(this.href+' '+window.location.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+            </section>
+
+        </footer>
+
+    </article>
+</main>
+
+
+
+
+        <footer class="site-footer clearfix">
+            <section class="copyright">
+              <p>
+                Licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> (unless explicitly mentioned)
+              </p>
+              <p style="text-align:left;margin-top:10px;"><img src="http://7colou.red/img/by-sa.png" alt="CC BY-SA 3.0"/></p>
+            </section>
+            <section class="poweredby">Proudly published with <a href="https://github.com/fsprojects/FsBlog">FsBlog</a></section>
+        </footer>
+
+    </div>
+
+    
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="http://7colou.red/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="http://7colou.red/js/index.js"></script>
+
+</body>
+</html>
