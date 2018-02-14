@@ -40,7 +40,7 @@
       <description>&lt;p&gt;F# は OCaml を .NET に乗っけて色々足した言語だが、その過程で失ってしまったものもたくさんあり、
 その中でも特に痛いのは functor がないことだ。&lt;/p&gt;
 &lt;p&gt;そして F# には高階型も型クラスもないので、われわれは例の interface でなんとか生き延びざるを得ない……&lt;/p&gt;
-&lt;p&gt;……わけではない。&lt;/p&gt;
+&lt;p&gt;……わけでもない。&lt;/p&gt;
 
 
 </description>
