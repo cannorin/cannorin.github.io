@@ -75,7 +75,8 @@ module Blog =
           use html = DisposableFile.CreateTemp(".html")
           File.WriteAllText(fsx.FileName, content |> RemoveScriptAbstractMarker)
           if ext = ".fsx" then
-              Literate.ProcessScriptFile(fsx.FileName, template, html.FileName, ?prefix=prefix)
+              let fsi = FsiEvaluator() :> IFsiEvaluator
+              Literate.ProcessScriptFile(fsx.FileName, template, html.FileName, ?prefix=prefix, ?fsiEvaluator=Some fsi)
           else
               Literate.ProcessMarkdown(fsx.FileName, template, html.FileName, ?prefix=prefix,
                                        customizeDocument = BlogCustomizations.CustomizeDocument)
