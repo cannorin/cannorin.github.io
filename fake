@@ -10,5 +10,5 @@ else
   [ ! -f .paket/paket.exe ] && mono --runtime=v4.0 .paket/paket.bootstrapper.exe
   [ ! -f bin/FsBlogLib/FsBlogLib.dll ] && bash build
   mono --runtime=v4.0 .paket/paket.exe restore
-  mono --runtime=v4.0 packages/FAKE/tools/FAKE.exe fsblog.fsx -d:MONO $@
+  mono packages/FAKE/tools/FAKE.exe fsblog.fsx -d:MONO $@
 fi

@@ -13,7 +13,7 @@ F# は OCaml を .NET に乗っけて色々足した言語だが、その過程�
 
 そして F# には高階型も型クラスもないので、われわれは例の interface でなんとか生き延びざるを得ない……
 
-……わけではない。
+……わけでもない。
 
 *)
 
@@ -46,8 +46,11 @@ type MonadClass<'a, 'Ma, 'Mb> = {
 *)
 
 type MonadBuiltin = MonadBuiltin with
-  static member MonadImpl (_: option<_>) = { Bind = Option.bind; Return = Some }
-  static member MonadImpl (_: Result<_,_>) = { Bind = Result.bind; Return = Ok }
+  static member MonadImpl (_: option<_>) =
+    { Bind = Option.bind; Return = Some }
+
+  static member MonadImpl (_: Result<_,_>) =
+    { Bind = Result.bind; Return = Ok }
 
 (**
 そして、`^Builtin` 型もしくはモナドになる型 `^Ma` から bind/return の実装を取り出すインライン関数 `getImpl` を定義する。
@@ -62,8 +65,12 @@ SRTP は型が持っているメンバに対して制約をかけることがで
 ここでも MonadBuiltin と同様のテクニックで、ダミーの引数を使って入手する実装の型を指定している。
 *)
 
-let inline getImpl (builtin: ^Builtin) (dummy: MonadClass< ^a, ^Ma, ^Mb >) : MonadClass< ^a, ^Ma, ^Mb > =
-  ((^Builtin or ^Ma): (static member MonadImpl: ^Ma -> MonadClass< ^a, ^Ma, ^Mb >) (Unchecked.defaultof< ^Ma >))
+let inline getImpl (builtin: ^Builtin) 
+                   (dummy: MonadClass< ^a, ^Ma, ^Mb >) 
+                   : MonadClass< ^a, ^Ma, ^Mb > =
+  ((^Builtin or ^Ma):
+     (static member MonadImpl: ^Ma -> MonadClass< ^a, ^Ma, ^Mb >) (Unchecked.defaultof< ^Ma >)
+  )
 
 (**
 先ほど定義しておいたビルトイン実装と `getImpl` を組み合わせて、任意のコンテナ型に対する bind/return を定義する。
@@ -72,10 +79,14 @@ let inline getImpl (builtin: ^Builtin) (dummy: MonadClass< ^a, ^Ma, ^Mb >) : Mon
 *)
 
 let inline bind_ (f: ^a -> ^Mb) (x: ^Ma) : ^Mb =
-  (getImpl MonadBuiltin (Unchecked.defaultof<MonadClass< ^a, ^Ma, ^Mb >>)).Bind f x
+  (getImpl MonadBuiltin 
+           (Unchecked.defaultof<MonadClass< ^a, ^Ma, ^Mb >>)
+  ).Bind f x
 
 let inline return_ (x: ^a) : ^Ma =
-  (getImpl MonadBuiltin (Unchecked.defaultof<MonadClass< ^a, ^Ma, _ >>)).Return x
+  (getImpl MonadBuiltin
+           (Unchecked.defaultof<MonadClass< ^a, ^Ma, _ >>)
+  ).Return x
 
 (**
 最後に、モナ……コンピューテーション式を定義。
@@ -96,23 +107,21 @@ let monad = MonadBuilder ()
 では、動かしてみよう。
 *)
 
-let m1 = 
-  monad {
-    let! a = Some 21
-    let! b = Some 2
-    return a * b
-  } 
+monad {
+  let! a = Some 21
+  let! b = Some 2
+  return a * b
+} |> printfn "%A"
 
-(*** include-value: m1 ***)
+// Some 42
 
-let m2 =
-  monad {
-    let! a = Ok 21
-    let! b = Ok 2
-    return sprintf "%i, %i" a b
-  }
+monad {
+  let! a = Ok 42
+  let! b = Error "err"
+  return sprintf "%i, %i" a b
+} |> printfn "%A"
 
-(*** include-value: m2 ***)
+// Error "err"
 
 (** 
 自作型を定義して、型クラス `MonadClass` のインスタンスにする。 
@@ -128,14 +137,13 @@ type YesNo<'a> = Yes of 'a | No with
 同じように使える。 
 *)
 
-let m3 =
-  monad {
-    let! a = Yes 21
-    let! b = Yes 2
-    return a = b
-  }
+monad {
+  let! a = Yes 21
+  let! b = Yes 2
+  return a = b
+} |> printfn "%A"
 
-(*** include-value: m3 ***)
+// Yes false
 
 (**
 なお、 orphan instances は type extension で外部モジュールの型に追加したメンバでは SRTP のメンバ制約を満たすことができないことによって（偶然）防がれている。
