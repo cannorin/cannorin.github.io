@@ -37,7 +37,15 @@
         <section class="post-content">
           @RenderBody()
         </section>
-
+        <hr />
+        <section>
+          <script src="https://utteranc.es/client.js"
+                  repo="cannorin/cannorin.github.io"
+                  branch="master"
+                  issue-term="title"
+                  async>
+          </script>
+        </section> 
         <footer class="post-footer">
 
             @*{{#if image}}
@@ -45,7 +53,6 @@
                 <a class="img" href="{{url}}" style="background-image: url({{image}})"><span class="hidden">{{name}}'s Picture</span></a>
             </figure>
             {{/if}}*@
-
             <section class="share">
                 <h4>Share this post</h4>
                 @{ var title = System.Net.WebUtility.UrlEncode(Title); }
