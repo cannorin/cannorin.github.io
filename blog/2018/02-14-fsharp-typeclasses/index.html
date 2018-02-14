@@ -83,9 +83,6 @@
 </table>
 <p>コンテナ型 <code>M</code> に対する bind/return の実装を、型 <code>MonadClass&lt;'a, M&lt;'a&gt;, M&lt;'b&gt;&gt;</code> の値で持つことになる。</p>
 <p>次に、既存の型を "インスタンス化" しておく。今回は <code>'a option</code> と <code>Result&lt;'a, 'b&gt;</code> を使う。</p>
-<p>ダミーの引数でコンテナ型を明示的に指定させるのは、 F# コンパイラがオーバーロードを自動で解決できるようにするため。</p>
-<p>たとえば引数を <code>unit</code> などにしてしまうと、どのオーバーロードを呼べば目的のコンテナ型に対する実装が手に入るのかが判断できなくなってしまう。</p>
-<p>このビルトイン実装は後ほど使う。</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -102,12 +99,12 @@
 </code></pre></td>
 </tr>
 </table>
+<p>ダミーの引数でコンテナ型を明示的に指定させるのは、 F# コンパイラがオーバーロードを自動で解決できるようにするため。</p>
+<p>たとえば引数を <code>unit</code> などにしてしまうと、どのオーバーロードを呼べば目的のコンテナ型に対する実装が手に入るのかが判断できなくなってしまう。</p>
+<p>このビルトイン実装は後ほど使う。</p>
 <p>そして、<code>^Builtin</code> 型もしくはモナドになる型 <code>^Ma</code> から bind/return の実装を取り出すインライン関数 <code>getImpl</code> を定義する。</p>
 <p>インライン関数では Statically Resolved Type Parameters (SRTP) を型パラメータに取ることができて、通常の型パラメータが <code>'T</code> と
 表記されるのに対して SRTP は <code>^T</code> と表記される。</p>
-<p>SRTP は型が持っているメンバに対して制約をかけることができる。ここでは、メンバ <code>MonadImpl</code> を型 <code>^Builtin</code> もしくは <code>^Ma</code> が持っていることを要求している。</p>
-<p>また SRTP はコンパイル時に消えてしまうので、<code>^Ma</code> と <code>^Mb</code> はここでは高階型ではないのだが、インライン展開後にはコンテナ型が具体化されて、結果的に高階型<em>だったことになる</em>。</p>
-<p>ここでも <code>MonadBuiltin</code> と同様のテクニックで、ダミーの引数を使って入手する実装の型を指定している。</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -124,8 +121,10 @@
 </code></pre></td>
 </tr>
 </table>
+<p>SRTP は型が持っているメンバに対して制約をかけることができる。ここでは、メンバ <code>MonadImpl</code> を型 <code>^Builtin</code> もしくは <code>^Ma</code> が持っていることを要求している。</p>
+<p>また SRTP はコンパイル時に消えてしまうので、<code>^Ma</code> と <code>^Mb</code> はここでは高階型ではないのだが、インライン展開後にはコンテナ型が具体化されて、結果的に高階型<em>だったことになる</em>。</p>
+<p>ここでも <code>MonadBuiltin</code> と同様のテクニックで、ダミーの引数を使って入手する実装の型を指定している。</p>
 <p>先ほど定義しておいたビルトイン実装と <code>getImpl</code> を組み合わせて、任意のコンテナ型に対する bind/return を定義する。</p>
-<p>ここでもインライン関数を使って SRTP で制約をかけており、コンテナ型 <code>^Ma</code> は <code>MonadBuiltin</code> で bind/return をすでに実装してあるか、自分でメンバに実装を持っていなければならない。</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -148,6 +147,7 @@
 </code></pre></td>
 </tr>
 </table>
+<p>ここでもインライン関数を使って SRTP で制約をかけており、コンテナ型 <code>^Ma</code> は <code>MonadBuiltin</code> で bind/return をすでに実装してあるか、自分でメンバに実装を持っていなければならない。</p>
 <p>最後に、モナ……コンピューテーション式を定義。</p>
 <p><code>do</code> は残念ながら予約語なので恐怖の the M-word で代用する。</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
