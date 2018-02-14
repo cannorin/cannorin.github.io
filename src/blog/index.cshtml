@@ -20,7 +20,17 @@
         </header>
     </article>
   }
-  @foreach (var post in Model.Posts)
+  @if (!Model.IsPostCategoryPage)
+  {
+    <article class="post">
+      <section class="post-content">
+        <p>
+          <a href="@Model.Root/blog/tag">Tags</a> &nbsp; <a href="@Model.Root/blog/archive">Archive</a>
+        </p>
+      </section>
+    </article>
+  }
+  @foreach (var post in Model.IsPostCategoryPage ? Model.Posts : Model.Posts.Where(post => !post.Tags.Contains("meta")))
   {
     <article class="post">
 
