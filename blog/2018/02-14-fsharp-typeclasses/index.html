@@ -65,8 +65,8 @@
 その中でも特に痛いのは functor がないことだ。</p>
 <p>そして F# には高階型も型クラスもないので、われわれは例の interface でなんとか生き延びざるを得ない……</p>
 <p>……わけでもない。</p>
-<p>とりあえず Haskell の do-notation を実現する。</p>
-<p>まず、名前を言ってはいけないあの概念を表す "型クラス" を作る。</p>
+<p>F# の言語機能の隠された真の力をお伝えするために、とりあえずは Haskell の do-notation のようなものを実現してみせよう。</p>
+<p>まず、名前を言ってはいけない例のあの概念を表す "型クラス" を作る。</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -106,8 +106,8 @@
 <p>インライン関数では Statically Resolved Type Parameters (SRTP) を型パラメータに取ることができて、通常の型パラメータが <code>'T</code> と
 表記されるのに対して SRTP は <code>^T</code> と表記される。</p>
 <p>SRTP は型が持っているメンバに対して制約をかけることができる。ここでは、メンバ <code>MonadImpl</code> を型 <code>^Builtin</code> もしくは <code>^Ma</code> が持っていることを要求している。</p>
-<p>また SRTP はコンパイル時に消えてしまうので、<code>^Ma</code> と <code>^Mb</code> はここでは高階型ではないのだが、インライン展開後にはコンテナ型が具体化されて、結果的に高階型"だったことになる"。</p>
-<p>ここでも MonadBuiltin と同様のテクニックで、ダミーの引数を使って入手する実装の型を指定している。</p>
+<p>また SRTP はコンパイル時に消えてしまうので、<code>^Ma</code> と <code>^Mb</code> はここでは高階型ではないのだが、インライン展開後にはコンテナ型が具体化されて、結果的に高階型<em>だったことになる</em>。</p>
+<p>ここでも <code>MonadBuiltin</code> と同様のテクニックで、ダミーの引数を使って入手する実装の型を指定している。</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -125,7 +125,7 @@
 </tr>
 </table>
 <p>先ほど定義しておいたビルトイン実装と <code>getImpl</code> を組み合わせて、任意のコンテナ型に対する bind/return を定義する。</p>
-<p>ここでもインライン関数を使って SRTP で制約をかけており、コンテナ型 <code>^Ma</code> は MonadBuiltin で bind/return をすでに実装してあるか、自分でメンバに実装を持っていなければならない。</p>
+<p>ここでもインライン関数を使って SRTP で制約をかけており、コンテナ型 <code>^Ma</code> は <code>MonadBuiltin</code> で bind/return をすでに実装してあるか、自分でメンバに実装を持っていなければならない。</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -149,7 +149,7 @@
 </tr>
 </table>
 <p>最後に、モナ……コンピューテーション式を定義。</p>
-<p><code>do</code> は残念ながら予約後なので恐怖の M-word で代用する。</p>
+<p><code>do</code> は残念ながら予約語なので恐怖の the M-word で代用する。</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
