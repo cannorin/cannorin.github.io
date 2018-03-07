@@ -22,6 +22,18 @@
 </description>
     </item>
     <item>
+      <title>F# で型レベルプログラミング</title>
+      <guid>http://7colou.red//blog/2018/03-08-fsharp-type-level-computation</guid>
+      <link>http://7colou.red//blog/2018/03-08-fsharp-type-level-computation/index.html</link>
+      <pubDate>Wed, 07 Mar 2018 17:08:49 GMT</pubDate>
+      <description>&lt;p&gt;今 &lt;a href="https://github.com/cannorin/FSharp.Dependent"&gt;F# で依存型をシミュレートしようと頑張ってる&lt;/a&gt; のだけど、その途中でちょっと面白いことができたのでそこだけ切り出してまとめておく。&lt;/p&gt;
+&lt;p&gt;F# で型レベルプログラミングができたのだ。&lt;/p&gt;
+&lt;p&gt;(依存型シミュレートはそれなりに納得できる形になったら記事にするよ！)&lt;/p&gt;
+
+
+</description>
+    </item>
+    <item>
       <title>FsBlog でブログ構築</title>
       <guid>http://7colou.red//blog/2018/02-14-f</guid>
       <link>http://7colou.red//blog/2018/02-14-f/index.html</link>
