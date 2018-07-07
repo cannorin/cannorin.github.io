@@ -22,6 +22,17 @@
 </description>
     </item>
     <item>
+      <title>Dependent Types と Refinement Types の違い</title>
+      <guid>http://7colou.red//blog/2018/07-07-difference</guid>
+      <link>http://7colou.red//blog/2018/07-07-difference/index.html</link>
+      <pubDate>Fri, 06 Jul 2018 20:42:46 GMT</pubDate>
+      <description>&lt;p&gt;自分の tweets.zip をみてたら発掘された文章.&lt;/p&gt;
+&lt;p&gt;Dependent Types (依存型) と Refinement Types (篩型) は目指すところは似ているが, 導入スタイルに根本的な違いがある.&lt;/p&gt;
+
+
+</description>
+    </item>
+    <item>
       <title>F# で型レベルプログラミング</title>
       <guid>http://7colou.red//blog/2018/03-08-fsharp-type-level-computation</guid>
       <link>http://7colou.red//blog/2018/03-08-fsharp-type-level-computation/index.html</link>
