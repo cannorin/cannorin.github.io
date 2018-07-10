@@ -86,7 +86,7 @@
   (<span class="prep">::</span>) : a <span class="prep">-</span><span class="prep">&gt;</span> Vect n a <span class="prep">-</span><span class="prep">&gt;</span> Vect (S n) a
 </code></pre></td></tr></table>
 <p>ここで <code>Vect</code> は型変数 <code>a</code> だけでなく, リストの長さを表す自然数 <code>n</code> をパラメータとして取る. すなわち自然数の項が与えられなければ型を構成できない. この点で型 <code>Vect</code> は項に依存しているといえる.</p>
-<p>なお一般に普通の関数は項に依存する項, 多相型を持つ項は型に依存する項, 高階型は型に依存する型であり, dependent types はこの関係性のぽっかり空いた穴を埋める存在でもある.</p>
+<p>なお一般に普通の関数は項に依存する項, 多相型を持つ項は型に依存する項, 型コンストラクタは型に依存する型であり, dependent types はこの関係性のぽっかり空いた穴を埋める存在でもある.</p>
 <h2>Refinement Types</h2>
 <p>Refinement types とは型を述語で <em>修飾する</em> ものである.</p>
 <p>たとえば, Liquid Haskell において <code>Data.Vector</code> を長さで修飾するには次のようにする.</p>
@@ -106,7 +106,7 @@ measure vlen   <span class="prep">::</span>   (Vector a) <span class="prep">-</s
 assume  length <span class="prep">::</span> x:(Vector a) <span class="prep">-</span><span class="prep">&gt;</span> {v: Int | v <span class="prep">=</span> (vlen x)}
 assume  !      <span class="prep">::</span> x:(Vector a) <span class="prep">-</span><span class="prep">&gt;</span> {v: Int | <span class="n">0</span> <span class="prep">&lt;</span><span class="prep">=</span> v <span class="prep">&amp;&amp;</span> v <span class="prep">&lt;</span> (vlen x)} <span class="prep">-</span><span class="prep">&gt;</span> a
 </code></pre></td></tr></table>
-<p>ここで <code>vlen</code> は <code>Vector a</code> の持つ property を定義し(制約中に書けるように), <code>length</code> 関数で得られる値が <code>vlen</code> と等しいこと, <code>!</code> 関数でインデックスアクセスをするときはインデックスが 0 以上 <code>vlen</code> 未満であることをそれぞれ仮定している.</p>
+<p>ここでは <code>Vector a</code> の持つ property として <code>vlen</code> を定義しており(制約中に書けるように), <code>length</code> 関数で得られる値が <code>vlen</code> と等しいこと, <code>!</code> 関数でインデックスアクセスをするときはインデックスが 0 以上 <code>vlen</code> 未満であることをそれぞれ仮定している.</p>
 <p>Dependent types と大きく違うのは, こちらでは(実行時に)行われるのは本来の <code>Data.Vector</code> の動作そのものであり, ここで定義したこととは何も関係がないし, 取り除いても全く同じ動作をする. また本来の <code>Data.Vector</code> の実装を検証しているわけでももちろんない.</p>
 <h2>つまり</h2>
 <p>Dependent types は言語の一部である. 一方, refinement types は言語の外側にある. この関係は Church-style typing と Curry-style typing との関係と同じかたちをしている.</p>
@@ -137,6 +137,7 @@ assume  !      <span class="prep">::</span> x:(Vector a) <span class="prep">-</s
 </tbody>
 </table>
 
+<p>なお, dependent types と refinement types を両方持っていてもよく, F* などがそのような言語で実用的なものの例である.</p>
 
 
         </section>
