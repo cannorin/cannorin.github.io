@@ -1,12 +1,12 @@
 <rss version="2.0">
   <channel>
     <title>SevenColoured</title>
-    <link>http://7colou.red/</link>
+    <link>https://7colou.red/</link>
     <description></description>
     <item>
       <title>Tags</title>
-      <guid>http://7colou.red//blog/tag</guid>
-      <link>http://7colou.red//blog/tag/index.html</link>
+      <guid>https://7colou.red//blog/tag</guid>
+      <link>https://7colou.red//blog/tag/index.html</link>
       <pubDate>Sun, 30 Dec 2300 15:00:00 GMT</pubDate>
       <description>
 
@@ -14,8 +14,8 @@
     </item>
     <item>
       <title>Archive</title>
-      <guid>http://7colou.red//blog/archive</guid>
-      <link>http://7colou.red//blog/archive/index.html</link>
+      <guid>https://7colou.red//blog/archive</guid>
+      <link>https://7colou.red//blog/archive/index.html</link>
       <pubDate>Sun, 30 Dec 2300 15:00:00 GMT</pubDate>
       <description>
 
@@ -23,8 +23,8 @@
     </item>
     <item>
       <title>Dependent Types と Refinement Types の違い</title>
-      <guid>http://7colou.red//blog/2018/07-07-difference</guid>
-      <link>http://7colou.red//blog/2018/07-07-difference/index.html</link>
+      <guid>https://7colou.red//blog/2018/07-07-difference</guid>
+      <link>https://7colou.red//blog/2018/07-07-difference/index.html</link>
       <pubDate>Fri, 06 Jul 2018 20:42:46 GMT</pubDate>
       <description>&lt;p&gt;自分の tweets.zip をみてたら発掘された文章.&lt;/p&gt;
 &lt;p&gt;Dependent Types (依存型) と Refinement Types (篩型) は目指すところは似ているが, 導入スタイルに根本的な違いがある.&lt;/p&gt;
@@ -34,8 +34,8 @@
     </item>
     <item>
       <title>F# で型レベルプログラミング</title>
-      <guid>http://7colou.red//blog/2018/03-08-fsharp-type-level-computation</guid>
-      <link>http://7colou.red//blog/2018/03-08-fsharp-type-level-computation/index.html</link>
+      <guid>https://7colou.red//blog/2018/03-08-fsharp-type-level-computation</guid>
+      <link>https://7colou.red//blog/2018/03-08-fsharp-type-level-computation/index.html</link>
       <pubDate>Wed, 07 Mar 2018 17:08:49 GMT</pubDate>
       <description>&lt;p&gt;今 &lt;a href="https://github.com/cannorin/FSharp.Dependent"&gt;F# で依存型をシミュレートしようと頑張ってる&lt;/a&gt; のだけど、その途中でちょっと面白いことができたのでそこだけ切り出してまとめておく。&lt;/p&gt;
 &lt;p&gt;F# で型レベルプログラミングができたのだ。&lt;/p&gt;
@@ -46,8 +46,8 @@
     </item>
     <item>
       <title>FsBlog でブログ構築</title>
-      <guid>http://7colou.red//blog/2018/02-14-f</guid>
-      <link>http://7colou.red//blog/2018/02-14-f/index.html</link>
+      <guid>https://7colou.red//blog/2018/02-14-f</guid>
+      <link>https://7colou.red//blog/2018/02-14-f/index.html</link>
       <pubDate>Tue, 13 Feb 2018 19:00:48 GMT</pubDate>
       <description>&lt;p&gt;ブログを作っては爆破することを可算無限回繰り返してきたけど今度は爆破しないよ&lt;/p&gt;
 &lt;p&gt;もしもまた爆破したら木の下に埋めてもらっても構わないよ&lt;/p&gt;
@@ -57,8 +57,8 @@
     </item>
     <item>
       <title>F# で型クラス</title>
-      <guid>http://7colou.red//blog/2018/02-14-fsharp-typeclasses</guid>
-      <link>http://7colou.red//blog/2018/02-14-fsharp-typeclasses/index.html</link>
+      <guid>https://7colou.red//blog/2018/02-14-fsharp-typeclasses</guid>
+      <link>https://7colou.red//blog/2018/02-14-fsharp-typeclasses/index.html</link>
       <pubDate>Tue, 13 Feb 2018 18:54:24 GMT</pubDate>
       <description>&lt;p&gt;F# は OCaml を .NET に乗っけて色々足した言語だが、その過程で失ってしまったものもたくさんあり、
 その中でも特に痛いのは functor がないことだ。&lt;/p&gt;
