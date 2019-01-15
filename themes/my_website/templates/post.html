@@ -25,7 +25,7 @@
           %% for tag in tags do
             %% def tagUrl = string.url_encode tag
             %% when is_not_null config.tag do
-              <a href="{{config.base_url}}/{{config.tag}}/{{tagUrl}}.html">{{tag}}</a>
+              <a href="{{config.base_url}}/{{config.tag}}/{{tagUrl}}">{{tag}}</a>
             %% otherwise
               <span class="tag-name">{{tag}}</span>
             %% end
