@@ -27,9 +27,9 @@
             <span class="post-tags">
               Tags:
               %% for tag in page.tags do
-                %% def tag = string.url_encode tag
+                %% def tagUrl = string.url_encode tag
                 %% when is_not_null config.tag do
-                  <a href="{{config.base_url}}/{{config.tag}}/{{tag}}.html">{{tag}}</a>
+                  <a href="{{config.base_url}}/{{config.tag}}/{{tagUrl}}.html">{{tag}}</a>
                 %% otherwise
                   <span class="tag-name">{{ tag }}</span>
                 %% end
