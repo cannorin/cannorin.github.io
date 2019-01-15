@@ -12,11 +12,12 @@
         <p>
           %% when is_not_null tags && array.length tags > 0 do
           %% for tag in tags |> array.indexed do
+            %% def tagUrl = string.url_encode tag.item
             %% when tag.index <> 0 do
             ,
             %% end
             %% when is_not_null config.tag do
-              <a href="{{config.base_url}}/{{config.tag}}/{{tag.item}}.html">{{tag.item}}</a>
+              <a href="{{config.base_url}}/{{config.tag}}/{{tagUrl}}.html">{{tag.item}}</a>
             %% otherwise
               <span class="tag-name">{{tag.item}}</span>
             %% end
