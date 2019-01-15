@@ -1,66 +1,66 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <title>F# で型レベルプログラミング</title>
-    <meta name="description" />
-    
-    <meta name="HandheldFriendly" content="True" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    F# で型レベルプログラミング - SevenColoured
+  </title>
+  <meta name="description" content="今F# で依存型をシミュレートしようと頑張ってるのだけど、その途中でちょっと面白いことができたのでそこだけ切り出してまとめておく。" />
 
-    <link rel="alternate" href="https://7colou.red/rss.xml" title="SevenColoured" type="application/rss+xml">
-    <link rel="shortcut icon" href="https://7colou.red/favicon.png">
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="stylesheet" type="text/css" href="https://7colou.red/css/screen.css" />
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+  <link rel="alternate" href="https://7colou.red/rss.xml" title="SevenColoured" type="application/rss+xml">
+  <link rel="shortcut icon" href="https://7colou.red/favicon.png">
 
-    <!-- FSharp.Formatting Styles -->
-    <link rel="stylesheet" type="text/css" media="screen" href="https://7colou.red/fsharp.formatting/tooltips.css" />
-    <script type="text/javascript" src="https://7colou.red/fsharp.formatting/tooltips.js"></script>
-    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <link rel="stylesheet" type="text/css" href="https://7colou.red/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+  <!-- FSharp.Formatting Styles -->
+  <link rel="stylesheet" type="text/css" media="screen" href="https://7colou.red/fsharp.formatting/tooltips.css" />
+  <script type="text/javascript" src="https://7colou.red/fsharp.formatting/tooltips.js"></script>
+
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <link rel="stylesheet" href="https://7colou.red/highlight/styles/default.css">
+  <script src="https://7colou.red/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
 </head>
-<body class="post-template nav-closed">
 
-    <div class="nav">
-        
-        <a class="subscribe-button icon-feed" href="https://7colou.red/rss.xml">Subscribe</a>
-    </div>
-    <span class="nav-cover"></span>
-
-    <div class="site-wrapper">
-
-        
-
-<header class="main-header post-head no-cover">
+<body class="post-template">
+  <header class="default-header">
     <nav class="main-nav clearfix">
-        <a class="nav-item" href="https://7colou.red">Home</a>
-        <a class="nav-item" href="https://7colou.red/blog/">Blog</a>
-        
+      <a class="nav-item" href="https://7colou.red/index.html">Home</a>
+      <a class="nav-item" href="https://7colou.red/blog/index.html">Blog</a>
     </nav>
-</header>
+  </header>
+  
+<span class="nav-cover"></span>
+
+  <div class="site-wrapper">
+    
 <main class="content" role="main">
-    <article class="post">
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">F# で型レベルプログラミング</h1>
+      <section class="post-meta">
+        <time class="post-date" datetime="2018-03-08T02:08:49.0000000">
+            <a href="https://7colou.red/blog/archive/2018-3.html">
+              2018年3月8日木曜日 2:08:49
+            </a>
+        </time>
+        <span class="tags">
+          <strong>Tags: </strong>
+              <a href="https://7colou.red/blog/tag/F#.html">F#</a>
+        </span>
+      </section>
+    </header>
 
-        <header class="post-header">
-            <h1 class="post-title">F# で型レベルプログラミング</h1>
-            <section class="post-meta">
-
-
-
-                <time class="post-date" datetime="2018-03-08T02:08:49">
-                  <a href="https://7colou.red/blog/archive/march-2018">2018/03/08 2:08:49</a>
-                </time>
-                <span class="tags"><strong>Tags: </strong>
-                        <a href="https://7colou.red/blog/tag/fsharp">F#</a>
-                </span>
-            </section>
-        </header>
-
-        <section class="post-content">
-          
-<p>今 <a href="https://github.com/cannorin/FSharp.Dependent">F# で依存型をシミュレートしようと頑張ってる</a> のだけど、その途中でちょっと面白いことができたのでそこだけ切り出してまとめておく。</p>
+    <section class="post-content">
+      <p>今 <a href="https://github.com/cannorin/FSharp.Dependent">F# で依存型をシミュレートしようと頑張ってる</a> のだけど、その途中でちょっと面白いことができたのでそこだけ切り出してまとめておく。</p>
 <p>F# で型レベルプログラミングができたのだ。</p>
 <p>(依存型シミュレートはそれなりに納得できる形になったら記事にするよ！)</p>
 <p>いつものように inline functions と SRTP を悪用していくわけだけど、F# の型引数にはある望まざる性質があるので、型を値として受け渡しするラッパを用意しておく。</p>
@@ -528,56 +528,69 @@
 <div class="tip" id="fs71">static member LT.eval : Ty&lt;LT&lt;&#39;X,&#39;Y&gt;&gt; -&gt; &#39;a (requires member eval and member gt and member eval)<br /><br />Full name: 03-08-fsharp-type-level-computation_.LT`2.eval</div>
 <div class="tip" id="fs72">val y : Ty&lt;False&gt;<br /><br />Full name: 03-08-fsharp-type-level-computation_.y</div>
 
-        </section>
-        <hr />
-        <section>
-          <script src="https://utteranc.es/client.js"
-                  repo="cannorin/cannorin.github.io"
-                  branch="master"
-                  issue-term="title"
-                  async>
-          </script>
-        </section> 
-        <footer class="post-footer">
 
-            
-            <section class="share">
-                <h4>Share this post</h4>
+    </section>
+    <hr />
+    <section>
+      <script src="https://utteranc.es/client.js"
+              repo="cannorin/cannorin.github.io"
+              branch="master"
+              issue-term="title"
+              async>
+      </script>
+    </section> 
 
-                <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=F%23+%E3%81%A7%E5%9E%8B%E3%83%AC%E3%83%99%E3%83%AB%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0 -"
-                    onclick="window.open(this.href+' '+window.location.href, 'twitter-share', 'width=550,height=235');return false;">
-                    <span class="hidden">Twitter</span>
-                </a>
-            </section>
+    <footer class="post-footer">
+      <section class="share">
+        <h4>Share this post</h4>
+        <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=F%23%20%E3%81%A7%E5%9E%8B%E3%83%AC%E3%83%99%E3%83%AB%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0%20-%20SevenColoured"
+           onclick="window.open(this.href+' '+window.location.href, 'twitter-share', 'width=550,height=235');return false;">
+          <span class="hidden">Twitter</span>
+        </a>
+        <a href="https://mastoshare.net/post.php?text=F%23%20%E3%81%A7%E5%9E%8B%E3%83%AC%E3%83%99%E3%83%AB%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0%20-%20SevenColoured" onclick="window.open(this.href+' '+window.location.href, '', 'width=500,height=400'); return false;"><img src="https://mastoshare.net/img/toot.svg" width="75" height="20"></a>
+      </section>
+    </footer>
 
-        </footer>
-
-    </article>
+    &nbsp;
+  </article>
 </main>
 
+<aside class="read-next">
+  <a class="read-next-story prev" href="https://7colou.red/<!-- key not found: 'location' (at , Ln 69/Col 63) -->">
+    <section class="post">
+      <h2> F# で型クラス </h2>
+      <section class="post-excerpt">
+        F# の言語機能の隠された真の力をお伝えするために、とりあえずは Haskell の do-notation のようなものを実現してみせよう。
+      </section>
+    </section>
+  </a>
+  <a class="read-next-story" href="https://7colou.red/<!-- key not found: 'location' (at , Ln 81/Col 58) -->">
+    <section class="post">
+      <h2> Dependent Types と Refinement Types の違い </h2>
+      <section class="post-excerpt">
+        Dependent Types (依存型) と Refinement Types (篩型) は目指すところは似ているが, 導入スタイルに根本的な違いがある.
+      </section>
+    </section>
+  </a>
+</aside>
 
+  </div>
 
+  <footer class="site-footer clearfix">
+    <section class="copyright">
+      <p>
+        Articles are licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> (unless explicitly mentioned)
+      </p>
+      <p>
+        Code examples are licensed under the <a href="https://directory.fsf.org/wiki/License:Expat">Expat(MIT) license</a>.
+      </p>
+      <p style="text-align:left;margin-top:10px;"><img src="https://7colou.red/img/by-sa.png" alt="CC BY-SA 3.0"/></p>
+    </section>
+  </footer>
 
-        <footer class="site-footer clearfix">
-            <section class="copyright">
-              <p>
-                Articles are licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> (unless explicitly mentioned)
-              </p>
-              <p>
-                Code examples are licensed under the <a href="https://directory.fsf.org/wiki/License:X11">X11 license</a>.
-              </p>
-              <p style="text-align:left;margin-top:10px;"><img src="https://7colou.red/img/by-sa.png" alt="CC BY-SA 3.0"/></p>
-            </section>
-            <section class="poweredby">Proudly published with <a href="https://github.com/fsprojects/FsBlog">FsBlog</a></section>
-        </footer>
-
-    </div>
-
-    
-
-    <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script type="text/javascript" src="https://7colou.red/js/jquery.fitvids.js"></script>
-    <script type="text/javascript" src="https://7colou.red/js/index.js"></script>
+  <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/jquery.fitvids.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/index.js"></script>
 
 </body>
 </html>
