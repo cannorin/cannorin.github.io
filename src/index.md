@@ -14,6 +14,8 @@ It works!
 
 [nml](https://github.com/cannorin/nml)
 
+[flxble](https://github.com/cannorin/flxble)
+
 ## Collaborative Projects
 
 [CoreTweet](https://coretweet.github.io)
