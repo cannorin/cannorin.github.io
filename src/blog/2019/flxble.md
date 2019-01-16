@@ -17,11 +17,11 @@ Hugo ほどではないが十分高速なブログエンジンの部類に入る
 
 [^immutable]: F# の標準ライブラリの `List` や `Map` はすべて immutable なので, 何も考えてなくても勝手にスレッドセーフになる. ここらへんは ML 系言語の面目躍如ではないだろうか.
 
-そのお陰で安全に並列化できるのだが, 並列化しなくても既存の end-user[^end-user] .NET テンプレートエンジンの中で[おそらく最速](https://github.com/cannorin/flxble/wiki/Flxble.Templating:-Benchmarks) になってしまった.
+そのお陰で安全に並列化できるのだが, 並列化しなくても既存の end-user[^end-user] .NET テンプレートエンジンの中で[おそらく最速](https://github.com/cannorin/flxble/wiki/Flxble.Templating:-Benchmarks)になってしまった.
 
 [^end-user]: 独自のスクリプト言語を採用しているなどの理由で任意コードの実行ができず, エンドユーザに使わせても安全なもの. Razor は無制限で C# を使えるのでこの枠には入らない.
 
-せっかくなので Hugo にも勝ちたいが, プロファイラにかけたところ, 実行時間のほどんどを Markding の Markdown パーシング・レンダリングが占めていたので,
+せっかくなので Hugo にも勝ちたいが, プロファイラにかけたところ, 実行時間のほどんどを Markdig の Markdown パーシング・レンダリングが占めていたので,
 自分で書いた部分をいくら弄ってもこれ以上速くなる望みがあまりないことがわかった.
 
 さすがに Markdown 処理系を自作したくはない.
