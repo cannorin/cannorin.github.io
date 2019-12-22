@@ -36,7 +36,7 @@ Authenticator というのは認証用の LAN スイッチで，部室には存�
 
 図で説明すると以下のようである：
 
-![https://i.imgur.com/oRCaDIy.png](図)
+![図](https://i.imgur.com/oRCaDIy.png)
 
 Authenticator は MAC アドレス等で端末を識別しているようだが，VPN によってクライアント PC からのパケットは人柱 PC からのフレームの中に包まれるため，全て人柱 PC からの通信となって認証を突破することができる．
 
