@@ -73,7 +73,7 @@
 <p>そしてインターネット上に専用の OpenVPN Server を用意し，そこに接続する．</p>
 <p>すると，アクセスポイント化した PC に他の PC を接続することで，インターネットにアクセスできるようになる．</p>
 <p>図で説明すると以下のようである：</p>
-<p><img src="%E5%9B%B3" alt="https://i.imgur.com/oRCaDIy.png" /></p>
+<p><img src="https://i.imgur.com/oRCaDIy.png" alt="図" /></p>
 <p>Authenticator は MAC アドレス等で端末を識別しているようだが，VPN によってクライアント PC からのパケットは人柱 PC からのフレームの中に包まれるため，全て人柱 PC からの通信となって認証を突破することができる．</p>
 <h2 id="section-1">ハマった（てる）ところ</h2>
 <h3 id="udp-123-ntp-openvpn-wget">UDP 123 (NTP) で OpenVPN サーバを建てていると wget が通らない</h3>
