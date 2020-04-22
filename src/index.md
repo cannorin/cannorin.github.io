@@ -30,6 +30,10 @@
 
 <iframe width="100%" height="120" src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&light=1&feed=%2Fcannorin%2F" frameborder="0" ></iframe>
 
+[SpeakerDeck](https://speakerdeck.com/cannorin/)
+
+<script async class="speakerdeck-embed" data-id="cdaf450125fa4655b57870cd3641d8a5" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
+
 ## Other Identities
 
 * Discord: cannorin\#5009
