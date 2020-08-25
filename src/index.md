@@ -22,7 +22,7 @@
 
 [pixiv FANBOX](https://www.pixiv.net/fanbox/creator/14529027) - mostly personal and non-tech diary
 
-[Steam](https://steamcommunity.com/id/cannorin) | [Twitch](https://www.twitch.tv/cannorin) | Discord: cannorin\#5009
+[Steam](https://steamcommunity.com/id/cannorin) | [Twitch](https://www.twitch.tv/cannorin) | [zKillboard](https://zkillboard.com/character/96980978/) | Discord: cannorin\#5009
 
 <script async class="speakerdeck-embed" data-id="cdaf450125fa4655b57870cd3641d8a5" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
 
