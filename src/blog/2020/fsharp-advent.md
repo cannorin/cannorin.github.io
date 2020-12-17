@@ -2,7 +2,7 @@
 type = 'post'
 title = 'F# で型クラス 2020'
 description = 'そろそろ F# での型クラスの実用的な作り方について書いておく'
-post_date = 2020-12-12T23:59:59.0000000+09:00
+post_date = 2020-12-17T19:00:00.0000000+09:00
 tags = ["fsharp", "advent", "type system"]
 ---
 
