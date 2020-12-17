@@ -3,7 +3,7 @@ type = 'post'
 title = 'F# で型クラス 2020'
 description = 'そろそろ F# での型クラスの実用的な作り方について書いておく'
 post_date = 2020-12-17T19:00:00.0000000+09:00
-tags = ["fsharp", "advent", "type system"]
+tags = ["F#", "advent", "type system"]
 ---
 
 この記事は [F# Advent Calendar 2020](https://qiita.com/advent-calendar/2020/fsharp) の12日目の記事です．投稿が遅れたのは [Cyberpunk 2077](https://www.cyberpunk.net/) のせいであって，私のせいではありません．
