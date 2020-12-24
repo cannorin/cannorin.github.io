@@ -12,6 +12,8 @@ tags = ["F#", "advent", "type system"]
 
 <script async class="speakerdeck-embed" data-slide="1" data-id="cdaf450125fa4655b57870cd3641d8a5" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
 
+----
+
 ## FSharpPlus と私について
 
 私です．ブログ記事には書き忘れたんですが去年の夏ぐらいから [FSharpPlus](https://github.com/fsprojects/FSharpPlus) のメンテナをやっています[^ionide]．
