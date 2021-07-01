@@ -10,15 +10,17 @@
 
 [Keybase](https://keybase.io/cannorin)
 
+[GitHub](https://github.com/cannorin)
+
 [Twitter::public](https://twitter.com/cannorin_pub) - tech stuff, announcement
 
-[Twitter::virtual](https://twitter.com/cannorin_vrc) - VRChat, music, gaming, DJing
+[Twitter::virtual](https://twitter.com/cannorin_vrc) - VRChat, DJing, music, gaming
 
 [Twitter::private](https://twitter.com/cannorin) - math, logic, IRL, s\*\*tposting
 
 [Mastodon](https://mstdn.maud.io/@alice)
 
-[GitHub](https://github.com/cannorin)
+[Qiita](https://qiita.com/cannorin/)
 
 [pixiv FANBOX](https://www.pixiv.net/fanbox/creator/14529027) - mostly personal and non-tech diary
 
@@ -38,7 +40,7 @@
 
 [See more](https://github.com/cannorin?tab=repositories) on GitHub.
 
-## Collaborative Projects
+## Collaborative Works
 
 [fsprojects/FSharpPlus](https://github.com/fsprojects/FSharpPlus) (maintainer)
 
@@ -46,7 +48,8 @@
 
 [CoreTweet](https://coretweet.github.io) (author)
 
-## VRChat Stuffs
+[ゴーストクラブ.コム](https://xn--pckjp4dudxftf.xn--tckwe/) (frontend & backend)
 
-[Udon Extern Search (Udon 関数検索)](./UdonExternSearch/)
+[The Virtual Underground: An Introduction to VRChat's Rave Scene](https://www.youtube.com/watch?v=R1wUg9HCODU) (translation & Japanese subtitles)
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/R1wUg9HCODU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
