@@ -10,8 +10,6 @@
 
 [Keybase](https://keybase.io/cannorin)
 
-[GitHub](https://github.com/cannorin)
-
 [Twitter::public](https://twitter.com/cannorin_pub) - tech stuff, announcement
 
 [Twitter::virtual](https://twitter.com/cannorin_vrc) - VRChat, DJing, music, gaming
@@ -24,25 +22,37 @@
 
 [pixiv FANBOX](https://www.pixiv.net/fanbox/creator/14529027) - mostly personal and non-tech diary
 
-[Patreon](https://www.patreon.com/cannorin) - FANBOX but in English
-
 [Steam](https://steamcommunity.com/id/cannorin) | [Twitch](https://www.twitch.tv/cannorin) | [zKillboard](https://zkillboard.com/character/96980978/) | Discord: cannorin\#5009
 
-<script async class="speakerdeck-embed" data-id="cdaf450125fa4655b57870cd3641d8a5" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLrylRy5cg4LDmFBnxoCfgXyY0W_EH6uuf" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-<iframe width="100%" height="120" src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&light=1&feed=%2Fcannorin%2F" frameborder="0" ></iframe>
+---
 
 ## Personal Works
 
-[nml](https://github.com/cannorin/nml)
+My personal projects are on [GitHub](https://github.com/cannorin?tab=repositories).
 
-[flxble](https://github.com/cannorin/flxble)
+- [nml](https://github.com/cannorin/nml)
 
-[See more](https://github.com/cannorin?tab=repositories) on GitHub.
+- [flxble](https://github.com/cannorin/flxble)
+
+- [FSharp.CommandLine](https://github.com/cannorin/FSharp.CommandLine)
+
+My music is available on [Bandcamp](https://cannorin.bandcamp.com/).
+
+<iframe style="border: 0; width: 100%; height: 120px;" src="https://bandcamp.com/EmbeddedPlayer/album=2788216308/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/artwork=small/transparent=true/" seamless><a href="https://cannorin.bandcamp.com/album/obliviator">obliviator by cannorin</a></iframe>
+
+My DJ mixes are available on [Mixcloud](https://www.mixcloud.com/cannorin/).
+
+<iframe width="100%" height="120" src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&light=1&feed=%2Fcannorin%2F" frameborder="0" ></iframe>
+
+The slides of my talks are available on [Speaker Deck](https://speakerdeck.com/cannorin).
+
+<script async class="speakerdeck-embed" data-id="cdaf450125fa4655b57870cd3641d8a5" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
+
+---
 
 ## Collaborative Works
+
+[ocsigen/ts2ocaml](https://github.com/ocsigen/ts2ocaml) (author)
 
 [fsprojects/FSharpPlus](https://github.com/fsprojects/FSharpPlus) (maintainer)
 
