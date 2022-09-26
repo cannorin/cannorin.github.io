@@ -52,7 +52,7 @@ tags = ["misc"]
 
 3日目の解散後に少しだけ軽井沢観光に行きました．
 
-フォロワーにおすすめされた美術館に行き，ご飯を食べて帰宅しました．
+フォロワーにおすすめされた[美術館](https://www.senju-museum.jp/)に行き，ご飯を食べて帰宅しました．
 
 > 偶然遭遇した[ゴママヨ](https://thinaticsystem.com/glossary/gomamayo)
 ![](https://imgur.com/MoncmAx.jpg)
