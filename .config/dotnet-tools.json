@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "flxble": {
+      "version": "1.0.3505.14949",
+      "commands": [
+        "flxble"
+      ]
+    }
+  }
+}

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        dotnet:
+          - 2.1.x
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use .NET ${{ matrix.dotnet }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet }}
+
+      - name: Install flxble
+        run: dotnet tool restore
+
+      - name: Build blog
+        run: dotnet flxble render-blog -l trace
+
+      - name: Push output to the output branch
+        if: success()
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: self
+          BRANCH: output
+          FOLDER: output
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MESSAGE: "Build ({sha}) {msg}"
