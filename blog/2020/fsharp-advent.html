@@ -1,0 +1,491 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <title>
+    F# で型クラス 2020 - SevenColoured
+  </title>
+  <meta name="description" content="そろそろ F# での型クラスの実用的な作り方について書いておく" />
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="alternate" href="https://7colou.red/rss.xml" title="SevenColoured" type="application/rss+xml">
+  <link rel="shortcut icon" href="https://7colou.red/favicon.png">
+
+  <link rel="stylesheet" type="text/css" href="https://7colou.red/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <link rel="stylesheet" href="https://7colou.red/highlight/styles/default.css">
+  <script src="https://7colou.red/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body class="post-template">
+  <header class="default-header">
+    <nav class="main-nav clearfix">
+      <a class="nav-item" href="https://7colou.red/index.html">Home</a>
+      <a class="nav-item" href="https://7colou.red/blog/index.html">Blog</a>
+      <a class="nav-item" style="float: right;">
+        <iframe src="https://github.com/sponsors/cannorin/button" title="Sponsor cannorin" height="35" width="116" style="border: 0; margin: 0;"></iframe>
+      </a>
+    </nav>
+  </header>
+  
+<span class="nav-cover"></span>
+
+  <div class="site-wrapper">
+    
+<main class="content" role="main">
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">F# で型クラス 2020</h1>
+      <section class="post-meta">
+        <time class="post-date" datetime="2020-12-17T19:00:00.0000000">
+            <a href="https://7colou.red/blog/archive/2020-12.html">
+              2020年12月17日木曜日 19:00:00
+            </a>
+        </time>
+        <span class="tags">
+          <strong>Tags: </strong>
+              <a href="https://7colou.red/blog/tag/F%23">F#</a>
+              <a href="https://7colou.red/blog/tag/advent">advent</a>
+              <a href="https://7colou.red/blog/tag/type%20system">type system</a>
+        </span>
+      </section>
+    </header>
+
+    <section class="post-content">
+      <p>この記事は <a href="https://qiita.com/advent-calendar/2020/fsharp">F# Advent Calendar 2020</a> の12日目の記事です．投稿が遅れたのは <a href="https://www.cyberpunk.net/">Cyberpunk 2077</a> のせいであって，私のせいではありません．</p>
+<p>昔このブログで <a href="https://7colou.red/blog/2018/02-14-fsharp-typeclasses/index.html">F# で型クラスを実現する方法</a> について書きましたが，FSharpPlus のメンテナになってからより実用的な手法を学んだので，改めて解説をしようというわけです．</p>
+<p>この記事では SRTP 自体の解説はしません．</p>
+<h2 id="section">基本的な事項</h2>
+<p>まず，この手法は Haskell などで一般的な型クラスを <strong>そのまま</strong> F# 上で再現するものではない．具体的には，関数を一つだけ含む型クラスしか作れない．それでは複数の関数を含む型クラス<a id="fnref:1" href="#fn:1" class="footnote-ref"><sup>1</sup></a>はどうするのかというと，インスタンス側で複数の型クラスを実装してあげればよいので，特に困ることはない．</p>
+<p>前回紹介した手法では型クラスに対応したデータ型を作ってそこに関数を格納したが，関数呼び出しにオーバーヘッドが発生してしまっていた．この手法では関数呼び出しは全てインライン展開されるので，パフォーマンスへの影響は最小限になる．</p>
+<p>また，この手法では型クラス同士の継承も自然に表現することができる．例えば，Monad を実装した型を自動的に Functor や Applicative にするということが可能である．FSharpPlus では<a href="https://fsprojects.github.io/FSharpPlus/abstractions.html">頻出する型クラスが一通り実装されている</a>のでチェックしてみてほしい<a id="fnref:2" href="#fn:2" class="footnote-ref"><sup>2</sup></a>．</p>
+<p>この手法の欠点は，例えばモナドであれば「モナドである」ということを制約として表現する方法がなく，「bind と return を実装している」とするしかないことだ．とはいえ SRTP 制約自体がとても手書きできたものではなく，書かずにコンパイラの推論に任せることが多いので，このことで困ることはあまりないだろう．</p>
+<p>また前回の手法と同様に，orphan instances を作ることはできない．</p>
+<h2 id="srtp">SRTP によるオーバーロード解決の基本的な考え方</h2>
+<p>SRTP は型に対するパターンマッチを実現する．例えば，次のような型があるとする．</p>
+<pre><code class="language-fsharp">type S&lt;'n&gt; = S of 'n
+type Z     = Z
+</code></pre>
+<p>これを使えば型レベル自然数<a id="fnref:3" href="#fn:3" class="footnote-ref"><sup>3</sup></a>が表現できる．例えば3は <code>S&lt;S&lt;S&lt;Z&gt;&gt;&gt;</code> である．</p>
+<p>型レベル自然数同士の足し算はどうすればいいだろうか？ SRTPを使って型レベルのパターンマッチを行い，再帰計算をしたいときは再帰的にオーバーロード解決を起こすようにすればよい．</p>
+<pre><code class="language-fsharp">let inline ( +^ ) (x: ^X) (y: ^Y) =
+  (^X: (static member ( +^ ): _*_-&gt;_) x,y)
+
+type S&lt;'n&gt; with
+  static member inline ( +^ ) (S x, y) = S (x +^ y)
+
+type Z     with
+  static member inline ( +^ ) (Z, y)   = y
+
+let three = S (S Z) + S Z /// S&lt;S&lt;S&lt;Z&gt;&gt;&gt;
+</code></pre>
+<p>今回は再帰呼び出しまでは行わないが，上の例とはまた違った複雑さをはらんでいる．それは orphan instances を作れないこと，つまり型クラスを定義しているモジュールの中で既存の型をインスタンス化しておく必要があることに由来している．</p>
+<h2 id="section-1">用語の導入</h2>
+<p>ある型クラスの関数 <code>foo</code> に対して，次の2つの型を導入したい．</p>
+<ul>
+<li><code>FooImpl</code> 型
+<ul>
+<li>型クラス実装時に用意する，オーバーロード解決の対象になる型．</li>
+<li>既存の型をインスタンス化するためのメソッドも，この型に定義する．</li>
+<li>この記事では，この種の型を <strong>Impl型</strong> と呼びたい．</li>
+</ul>
+</li>
+<li><code>Foo</code> 型
+<ul>
+<li>メソッド <code>Foo.Invoke</code> を呼び出すことで <code>foo</code> を使う．</li>
+<li>別になくてもいいのだが，実用上は上の <code>FooImpl</code> 型と合体させてしまうのが扱いやすい．</li>
+</ul>
+</li>
+</ul>
+<h2 id="section-2">インスタンス化する既存の型の取り扱い方</h2>
+<p>ユーザ定義型は SRTP で受け取り，オーバーロード解決を起こさせればいいだけだが，既存の型をインスタンス化したい場合は複数の方法がある．</p>
+<p>これはあなたが実装したいモナド（の関数）の種類によって変わってくる．
+なお，「オーバーロード解決をかけるメソッドのシグネチャ」とは，</p>
+<pre><code class="language-fsharp">(^T: (static member ...: ...) ...)
+</code></pre>
+<p>の構文を使ってオーバーロード解決をかけたいメソッドのシグネチャのことであり，「ユーザ定義型で実装させたいメソッドのシグネチャ」とは，例えば自作型 <code>A</code> を作るとして，</p>
+<pre><code class="language-fsharp">type A = ... with
+  static member ... (...) =
+    ...
+</code></pre>
+<p>として型クラスをインスタンス化する際に書きたいメソッドのシグネチャのことである．</p>
+<h3 id="section-3">1. オーバーロード解決をかけるメソッドのシグネチャと，ユーザ定義型で実装させたいメソッドのシグネチャが同じでよい場合</h3>
+<p>このケースは単純である．</p>
+<ol>
+<li>既存の型用の解決対象のメソッドを含む Impl型</li>
+<li>ユーザ定義型（自分自身で解決対象のメソッドを持つ）</li>
+</ol>
+<p>の2択でオーバーロード解決をかければよい．オーバーロード解決の観点からは，この2つは同じ優先順位にある．</p>
+<p>具体的には，次のような例である．</p>
+<pre><code class="language-fsharp">type BindImpl =
+  static member ( &gt;&gt;= ) (m: _ option, f) = Option.bind f m
+  static member ( &gt;&gt;= ) (m: _ list,   f) = List.collect f m
+
+type Bind =
+  static member inline Invoke (value: ^Ma, binder: 'a -&gt; ^Mb) : ^Mb =
+    // このヘルパー関数は書き方によって警告が出たり出なかったりする
+    // 警告が出るのはオーバーロード解決が早く起こりすぎてしまうのが原因だが，
+    // オーバーロード解決を遅延させる一般的な方法はよくわからない
+    let inline call (_impl: ^impl, m: ^m, _r: ^r, f) =
+      ((^impl or ^m or ^r): (static member (&gt;&gt;=): _*_-&gt;_) m,f)
+    call (Unchecked.defaultof&lt;BindImpl&gt;, value, Unchecked.defaultof&lt; ^Mb &gt;, binder)
+
+let inline (&gt;&gt;=) m f = Bind.Invoke (m, f)
+
+type M&lt;'t&gt; = M of 't with
+  static member (&gt;&gt;=) (M x, f) : M&lt;_&gt; = f x
+
+let m1 = Some 2  &gt;&gt;= fun x -&gt; Some (x + 1)
+let m2 = [1;2;3] &gt;&gt;= fun x -&gt; [x; x+1; x+2]
+let m3 = M 2     &gt;&gt;= fun x -&gt; M    (x + 1)
+</code></pre>
+<p>ここで起こっているオーバーロード解決は，ユーザ定義型 or <code>BindImpl</code> の2択である．
+<a href="https://7colou.red/blog/2018/02-14-fsharp-typeclasses/index.html">F# で型クラス</a> でやったことがわかっていれば
+特に理解に苦しむところはないと思う．</p>
+<p>もしあなたが実装したいモナド（の関数）がこの類ならば，おめでとう．話はここでおしまいである．しかし実際は，これで
+綺麗に実装できるのは <code>&gt;&gt;=</code> くらいしかない．</p>
+<h3 id="section-4">2. オーバーロード解決をかけるメソッドのシグネチャと，ユーザ定義型で実装させたいメソッドのシグネチャを別にしなければならない場合</h3>
+<p>ほとんどの関数がこのケースに該当する．このケースに該当するのは，オーバーロード解決において本来の引数以外にダミー引数を加えて表現しなければいけない情報が入っているときで，具体的には以下の通りである．</p>
+<ol>
+<li>戻り値の型に応じて呼び出すメソッドが変わるとき（例: <code>return</code>）</li>
+</ol>
+<ul>
+<li>戻り値の型を格納するダミー引数を加えないとオーバーロード解決ができない．</li>
+</ul>
+<ol start="2">
+<li>他の型クラスと継承関係にあるとき (例: <code>fmap</code>)</li>
+</ol>
+<ul>
+<li>ユーザ定義型が <code>&gt;&gt;=</code> と <code>return</code> だけを実装している場合は，それらを使いたい．</li>
+<li>しかし，ユーザ定義型が明示的に <code>fmap</code> を定義している場合は，<code>&gt;&gt;=</code> と <code>return</code> を無視してそちらを使いたい．</li>
+<li>オーバーロード解決の優先順位の情報をダミー引数で持つ必要がある．</li>
+</ul>
+<ol start="3">
+<li>特定のクラス・インターフェースを継承していれば使えるようにしたいとき (例: <code>fold</code>)</li>
+</ol>
+<ul>
+<li>ユーザ定義型が <code>seq</code> を継承している場合，<code>Seq.fold</code> を使いたい．</li>
+<li>しかし，ユーザ定義型が明示的に <code>fold</code> を実装している場合，<code>seq&lt;'t&gt;</code> を継承していたとしても無視してそれを使いたい．</li>
+<li>オーバーロード解決の優先順位の情報をダミー引数で持つ必要がある．</li>
+</ul>
+<p>ユーザ定義型で実装するメソッドのシグネチャには上で述べたダミー引数を含めたくない<a id="fnref:4" href="#fn:4" class="footnote-ref"><sup>4</sup></a>．そのため，オーバーロード解決の対象になるメソッドとユーザ定義型で実装するメソッドのシグネチャが異なることになる．</p>
+<p>もっと言うと 1. はオーバーロード解決の優先順位の問題でもある．どういうことかというと，例えば <code>return</code> を素朴に実装しようとすると以下のようになるだろう．</p>
+<pre><code class="language-fsharp">type ReturnImpl =
+  // 既存の型用
+  static member        Return (_: 'a option, x: 'a) = Some x
+  static member        Return (_: 'a list,   x: 'a) = [x]
+
+  // ユーザ定義型用
+  static member inline Return (_: ^Ma,       x: 'a) = (^Ma: (static member Return: 'a -&gt; ^Ma) x)
+
+type Return =
+  static member inline Invoke (x: 'x) : ^Ma =
+    let inline call_2 (_impl: ^a, output: ^b, x) = ((^a or ^b): (static member Return: _*_-&gt;_) output, x)
+    let inline call   (impl: 'a, output: 'b, x) = call_2 (impl, output, x)
+    call (Unchecked.defaultof&lt;ReturnImpl&gt;, Unchecked.defaultof&lt; ^Ma &gt;, x)
+
+let inline return_ x = Return.Invoke x
+</code></pre>
+<p>しかしこれでは <code>option</code> と <code>list</code> の <code>Return</code> メソッドが呼ばれてくれない．なぜそうなるかというと，この場合のオーバーロード解決時の型の候補は Impl型 である <code>ReturmImpl</code> 一択であり，コンパイラは次に <code>ReturnImpl</code> に含まれる3つの <code>Return</code> メソッドを同じ優先順位で解決しようとする．
+ここで SRTP はあくまで型パラメータなので，コンパイラは3つ目のオーバーロードが一番汎用性が高いと判断してそれを使ってしまう．しかし，<code>list</code> 型や <code>option</code> 型それ自身は <code>Return</code> メソッドを持たないため，制約解決に失敗する．
+コンパイラが特定のオーバーロードを選んだ結果として SRTP の制約解決に失敗した場合は，オーバーロード解決にフォールバックせずにそのままエラーを吐き，型付けに失敗してしまうのだ．</p>
+<p>この問題には別の解決方法もあるが，SRTPを含むメソッドの優先順位をそうでないメソッドよりも下げることでも解決できる．
+というわけで，まずはオーバーロード解決の優先順位付けについて解説しようと思う．</p>
+<h2 id="section-5">オーバーロード解決の優先順位付け</h2>
+<p>幸いなことに，ある方法を使えば，オーバーロード解決に対して優先順位を付けることができる．その方法とは，</p>
+<ol>
+<li>Impl型を他の型の部分型にしておく．</li>
+<li>オーバーロード解決対象になるメソッドのシグネチャに，Impl型をダミー引数として含めておく．</li>
+<li>オーバーロード解決の優先順位が低いメソッドはシグネチャ中のImpl型のダミー引数の型を上位型に変える．より優先順位が低いメソッドはさらに上位の型を使う．</li>
+</ol>
+<p>というものである．F# の制約解決器はどうやら「オーバーロードが見つからなかった場合，引数の型を上位型にしたものを探す」という挙動になっているらしく，後に解決して欲しいメソッドほど上位の型になるようなダミー引数を用意してあげることで優先順位を下げることができる．</p>
+<p>次のようなヘルパー型を用意しておく．</p>
+<pre><code class="language-fsharp">type Default1 = class inherit Default2 end
+and  Default2 = class inherit Default3 end
+and  Default3 = class end
+</code></pre>
+<p>これをどう使うかというと，</p>
+<ul>
+<li>オーバーロード解決の対象になる型（ここでは <code>FooImpl</code> とする）は <code>Default1</code> 型を継承するようにする．</li>
+<li>オーバーロード解決対象のメソッドに一つダミー引数を増やす．
+<ul>
+<li>オーバーロード解決の優先度が一番高いメソッドは，そのダミー引数の型を <code>FooImpl</code> にする．</li>
+<li>優先度が次に高いメソッドは，そのダミー引数の型を <code>Default1</code> にする．</li>
+<li>優先度がその次に高いメソッドは，そのダミー引数の型を <code>Default2</code> にする．</li>
+<li>...</li>
+</ul>
+</li>
+</ul>
+<p>というようになる．もし <code>N+1</code> 段階の優先順位を付けたい場合， <code>DefaultN</code> 型まで作る必要がある．</p>
+<h2 id="section-6">優先度付きのメソッドの配置ルール</h2>
+<p>さて，F# コンパイラが意図通りにオーバーロードを解決してくれるようにするために，守るべきルールがある．</p>
+<ol>
+<li>SRTP を含むオーバーロードは，同じ優先順位の中には一つしかないようにする．</li>
+</ol>
+<ul>
+<li>例えば <code>fmap</code> の場合，ユーザ定義の <code>fmap</code> を呼ぶためのメソッドと，ユーザ定義の <code>&gt;&gt;=</code> と <code>return</code> を使うメソッドは，別の優先順位に置かなければならない．</li>
+<li>これは，F# は2つのメソッドのシグネチャの等価性を判断する時，型変数に付いている制約を考慮しないからである．全く異なるメンバー制約が付いた SRTP であっても，ただの型変数に変えた時に同じになるならば，同一のシグネチャと判断される．</li>
+<li>F# においては同一のシグネチャを持つメソッドが複数存在することは許されないので，コンパイルエラーになる．</li>
+</ul>
+<ol start="2">
+<li>同じ優先順位内に，以下に挙げる種類のオーバーロードを全く含まないか，2つ以上を含んでいる必要がある<a id="fnref:5" href="#fn:5" class="footnote-ref"><sup>5</sup></a>．</li>
+</ol>
+<ul>
+<li>オーバーロード解決に関係する引数の型が，インターフェースもしくは継承が可能なクラスである．</li>
+<li>オーバーロード解決に関係する引数の型が，型変数（現実的にはSRTP）である．</li>
+</ul>
+<p>2.については，F# コンパイラ的には部分型制約も SRTP 制約も「解かなければいけない」という点で同じであるので，
+オーバーロード解決の時点では同じ種類の物体と認識しているのだと思う．
+F# コンパイラは，この種のオーバーロードが1個のみ存在しているならば無条件でマッチしようと試みて，失敗した場合他の候補を無視してコンパイルエラーを吐く．
+しかしこの種のオーバーロードが2個以上存在し，かつ現在解決中の型がそのどちらにもマッチしないとき，両方とも無視してオーバーロード候補の探索を進める性質があるようだ．</p>
+<p>もしインスタンス化する既存の型に継承可能なクラス<a id="fnref:6" href="#fn:6" class="footnote-ref"><sup>6</sup></a>やインターフェースが1つもない場合，ダミーのオーバーロードが2つ必要になる．それに用いるために，以下のダミー型を用意しておくとよい．</p>
+<pre><code class="language-fsharp">type Dummy1&lt;'t&gt;(x: 't) = class member val Value1 = x end
+type Dummy2&lt;'t&gt;(x: 't) = class member val Value2 = x end
+</code></pre>
+<p>ちなみに SRTP を使ったオーバーロードとダミーのインターフェースを使ったオーバーロードを同じ階層に置いても意図通り動作するようだ．もし不安ならば，</p>
+<ul>
+<li>SRTP（正確にはメンバ制約が付いている型変数）の制約を <code>when ^t: null and ^t: struct</code> に変える</li>
+<li>戻り値の arity を変える（戻り値がただの値ならば1変数関数にするなど）</li>
+</ul>
+<p>をしたオーバーロードを作ってあげればよい．これは</p>
+<ul>
+<li>オーバーロード解決の候補になる（引数の数が同じなため）</li>
+<li>元の SRTP を使ったオーバーロードとシグネチャが異なる（戻り値の arity が異なるため）</li>
+<li>絶対にマッチすることがない（ありえない制約を要求しているため）</li>
+</ul>
+<p>ので，うまくダミーのオーバーロードとして機能する．例えば，</p>
+<pre><code class="language-fsharp">  static member inline Return (_: ReturnImpl, _: ^Ma, x: 'a) = (^Ma: (static member Return: 'a -&gt; ^Ma) x)
+</code></pre>
+<p>に対しては，</p>
+<pre><code class="language-fsharp">  static member inline Return (_: ReturnImpl, _: ^Ma when ^Ma: struct and ^Ma: null, _) = id
+</code></pre>
+<p>としてあげるとよい．戻り値が <code>id</code> なので arity が異なることに注目．</p>
+<h2 id="foldable">実例: Foldable</h2>
+<p>例として <code>fold</code> を実装してみよう． <code>fold</code> に期待する挙動は以下のとおりだ．</p>
+<ul>
+<li>既存の型として <code>list</code>, <code>option</code>, <code>[]</code>, <code>seq</code> をサポートしたい．</li>
+<li>ユーザ定義型がメンバーとして <code>Fold</code> を持っている場合，それを優先して使いたい．</li>
+<li>それ以外の場合，<code>seq</code> を継承しているなら <code>Seq.fold</code> を使いたい．</li>
+</ul>
+<p>よって，メソッドの優先順位は次のようになるだろう．</p>
+<ul>
+<li>優先順位0 (<code>Fold</code>):
+<ul>
+<li><code>list</code></li>
+<li><code>option</code></li>
+<li><code>[]</code></li>
+</ul>
+</li>
+<li>優先順位1 (<code>Default1</code>):
+<ul>
+<li>ユーザ定義型 (SRTP)</li>
+</ul>
+</li>
+<li>優先順位2 (<code>Default2</code>)
+<ul>
+<li><code>seq</code> (インターフェース)</li>
+</ul>
+</li>
+</ul>
+<p>ルールに従い，優先順位1と優先順位2に一個ずつダミーのオーバーロードを追加することにする．
+よって，<code>fold</code> の定義は以下のようになる<a id="fnref:7" href="#fn:7" class="footnote-ref"><sup>7</sup></a>．</p>
+<pre><code class="language-fsharp">type Fold =
+  inherit Default1
+
+  // 優先順位0
+  static member        Fold (f, state, xs: _ list,      [&lt;Optional&gt;]_impl: Fold) = List.fold f state xs
+  static member        Fold (f, state, xs: _[],         [&lt;Optional&gt;]_impl: Fold) = Array.fold f state xs
+  static member        Fold (f, state, xs: _ option,    [&lt;Optional&gt;]_impl: Fold) = Option.fold f state xs
+
+  // 優先順位1
+  static member inline Fold (f: 's -&gt; 'a -&gt; 's, state: 's, xs: 'Fa, [&lt;Optional&gt;]_impl: Default1) = (^Fa: (static member Fold: _ * _ * ^Fa -&gt; ^s) f,state,xs)
+  static member        Fold (f, state, xs: Dummy1&lt;_&gt;, _impl: Default1) = f state xs.Value1
+
+  // 優先順位2
+  static member        Fold (f, state, xs: _ seq,  [&lt;Optional&gt;]_impl: Default2) = printfn &quot;using Seq.fold&quot;; Seq.fold f state xs
+  static member        Fold (f, state, xs: Dummy1&lt;_&gt;, _impl: Default2) = f state xs.Value1
+
+  static member inline Invoke (folder: 'State -&gt; 'T -&gt; 'State) (state: 'State) (foldable: 'FoldableT) : 'State =
+    let inline call_2 (impl: ^a, input: ^b, f, x) = ((^a or ^b): (static member Fold: _*_*_*_ -&gt; _) f,x,input,impl)
+    let inline call   (impl: 'a, input: 'b, f, x) = call_2 (impl, input, f, x)
+    call (Unchecked.defaultof&lt;Fold&gt;, foldable, folder, state)
+
+let inline fold (f: 'State -&gt; 'T -&gt; 'State) (state: 'State) (foldable: 'FoldableT) : 'State = Fold.Invoke f state foldable
+</code></pre>
+<p>これを以下の例を使ってテストしてみる．</p>
+<pre><code class="language-fsharp">type C&lt;'t&gt; = { item: 't list } with
+  interface System.Collections.Generic.IEnumerable&lt;'t&gt; with
+    member this.GetEnumerator() = (this.item :&gt; _ seq).GetEnumerator()
+  interface System.Collections.IEnumerable with
+    member this.GetEnumerator() = (this.item :&gt; _ seq).GetEnumerator() :&gt; _
+  static member Fold (f, state, x: C&lt;_&gt;) =
+    printfn &quot;using C.Fold&quot;
+    List.fold f state x.item
+
+// list, [], option
+let p1 = fold (fun state x -&gt; x :: state) [] [  1; 2; 3  ]
+let p2 = fold (fun state x -&gt; x :: state) [] [| 1; 2; 3 |]
+let p3 = fold (fun state x -&gt; x :: state) [] (Some 42)
+
+// seq を継承している型
+let p4 = fold (fun state x -&gt; x :: state) [] (Set.ofList [ 1; 2; 3 ])
+
+// seq を継承し，Fold も定義されている型
+let p5 = fold (fun state x -&gt; x :: state) [] { item = [ 1; 2; 3 ] }
+</code></pre>
+<p>なお，デバッグのために <code>Seq.fold</code> と <code>C.fold</code> には <code>printfn</code> を仕込んである．これは実行時に</p>
+<pre><code>using Seq.fold
+using C.fold
+</code></pre>
+<p>を出力するので，正しいオーバーロードが選ばれていることがわかる．</p>
+<h2 id="section-7">で，結局モナドはどう実装すればいいの</h2>
+<p>わかりやすいように実装すると，以下のようになるだろう．</p>
+<pre><code class="language-fsharp">type BindImpl =
+  static member ( &gt;&gt;= ) (m: _ option,  f) = Option.bind f m
+  static member ( &gt;&gt;= ) (m: _ list,    f) = List.collect f m
+  static member ( &gt;&gt;= ) (m: _ seq,     f) = Seq.collect f m
+  static member ( &gt;&gt;= ) (m: Dummy1&lt;_&gt;, f) = f m.Value1
+
+type Bind =
+  static member inline Invoke (value: ^Ma, binder: 'a -&gt; ^Mb) : ^Mb =
+    let inline call (_impl: ^impl, m: ^m, _r: ^r, f) =
+      ((^impl or ^m or ^r): (static member (&gt;&gt;=): _*_-&gt;_) m,f)
+    call (Unchecked.defaultof&lt;BindImpl&gt;, value, Unchecked.defaultof&lt; ^Mb &gt;, binder)
+
+let inline (&gt;&gt;=) m f = Bind.Invoke (m, f)
+
+type ReturnImpl =
+  inherit Default1
+  static member        Return (_: Default1, _: 'a option,   x: 'a) = Some x
+  static member        Return (_: Default1, _: 'a list,     x: 'a) = [x]
+  static member        Return (_: Default1, _: 'a seq ,     x: 'a) = Seq.singleton x
+  static member        Return (_: Default1, _: Dummy1&lt;'a&gt;,  x: 'a) = new Dummy1&lt;_&gt;(x)
+
+  static member inline Return (_: ReturnImpl, _: ^Ma, x: 'a) = (^Ma: (static member Return: 'a -&gt; ^Ma) x)
+  static member        Return (_: ReturnImpl, _: Dummy1&lt;'a&gt;, x: 'a) = new Dummy1&lt;_&gt;(x)
+
+type Return =
+  static member inline Invoke (x: 'x) : ^Ma =
+    let inline call_2 (impl: ^a, output: ^b, x) = ((^a or ^b): (static member Return: _*_*_-&gt;_) impl,output,x)
+    let inline call   (impl: 'a, output: 'b, x) = call_2 (impl, output, x)
+    call (Unchecked.defaultof&lt;ReturnImpl&gt;, Unchecked.defaultof&lt; ^Ma &gt;, x)
+
+let inline return_ x = Return.Invoke x
+
+type M&lt;'t&gt; = M of 't with
+  static member (&gt;&gt;=) (M x, f) : M&lt;_&gt; = f x
+  static member Return x = M x
+
+let m1 = Some 2  &gt;&gt;= fun x -&gt; return_ (x + 1) // int option
+let m2 = [1;2;3] &gt;&gt;= fun x -&gt; return_ (x + 1) // int list
+let m3 = M 2     &gt;&gt;= fun x -&gt; return_ (x + 1) // M&lt;int&gt;
+</code></pre>
+<h2 id="section-8">はい</h2>
+<p>よかったですね</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Monad とか<a href="#fnref:1" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>この記事の手法で実装された Monad や Applicative といった型クラスを使いたいだけなら，自分で作らずに FSharpPlus をインストールしてしまえばいいということでもある．<a href="#fnref:2" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>これについての話はクリスマスの記事に．<a href="#fnref:3" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:4">
+<p>含めてもいいが，インスタンス化が冗長になってしんどいし，オーバーロード解決が壊れかねない．<a href="#fnref:4" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:5">
+<p>これに関しては，優先順位が一番高い場合は絶対に従う必要があるようだが，それ以外の場合ではなくでも問題ないことが多々ある．怖い．<a href="#fnref:5" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:6">
+<p><code>option</code> や <code>list</code> などは，内部的にはクラスで実装されているが，継承可能ではない．一方，<code>seq</code> はインターフェース．<a href="#fnref:6" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:7">
+<p>面倒なので <code>FoldImpl</code> と <code>Fold</code> を分けずに一つの型で実装している．<a href="#fnref:7" class="footnote-back-ref">&#8617;</a></p>
+</li>
+</ol>
+</div>
+
+    </section>
+    <hr />
+    <section>
+      <script src="https://utteranc.es/client.js"
+              repo="cannorin/cannorin.github.io"
+              branch="master"
+              issue-term="title"
+              async>
+      </script>
+    </section> 
+
+    <footer class="post-footer">
+      <section class="share">
+        <h4>Share</h4>
+        <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=F%23%20%E3%81%A7%E5%9E%8B%E3%82%AF%E3%83%A9%E3%82%B9%202020%20-%20SevenColoured"
+           onclick="window.open(this.href+' '+window.location.href, 'twitter-share', 'width=550,height=235');return false;">
+          <span class="hidden">Twitter</span>
+        </a>
+        <a href="https://mastoshare.net/post.php?text=F%23%20%E3%81%A7%E5%9E%8B%E3%82%AF%E3%83%A9%E3%82%B9%202020%20-%20SevenColoured" onclick="window.open(this.href+' '+window.location.href, '', 'width=500,height=400'); return false;"><img src="https://mastoshare.net/img/toot.svg" width="75" height="20"></a>
+      </section>
+    </footer>
+
+    &nbsp;
+  </article>
+</main>
+
+<aside class="read-next">
+  <a class="read-next-story prev" href="https://7colou.red/blog/2019/fsharp-advent.html">
+    <section class="post">
+      <h2> [Qiita] 任意長のタプルをサポートする SRTP 制約の書き方 </h2>
+      <section class="post-excerpt">
+        あんまり一般受けするようなネタが思いつかなかったので，SRTP をゴリゴリ書いてる人向けの記事になってしまいました．ごめんなさい……
+      </section>
+    </section>
+  </a>
+  <a class="read-next-story" href="https://7colou.red/blog/2020/fsharp-advent-2.html">
+    <section class="post">
+      <h2> FSharpPlus に型安全な固定長リストが実装されるまでの話 </h2>
+      <section class="post-excerpt">
+        SRTP と型プロバイダを使った黒魔術が盛りだくさんです
+      </section>
+    </section>
+  </a>
+</aside>
+
+  </div>
+
+  <footer class="site-footer clearfix">
+    <section class="copyright">
+      <p>
+        Articles are licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> (unless explicitly mentioned)
+      </p>
+      <p>
+        Code examples are licensed under the <a href="https://directory.fsf.org/wiki/License:Expat">Expat(MIT) license</a>.
+      </p>
+      <p style="text-align:left;margin-top:10px;"><img src="https://7colou.red/img/by-sa.png" alt="CC BY-SA 3.0"/></p>
+    </section>
+    <section class="poweredby">
+      <p>
+        This site is powered by <a href="https://github.com/cannorin/flxble">Flxble</a>,
+        and <a href="https://7colou.red/blog/2019/flxble.html">it's my own blog engine!</a>
+      </p>
+    </section>
+  </footer>
+
+  <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/jquery.fitvids.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/index.js"></script>
+
+</body>
+</html>

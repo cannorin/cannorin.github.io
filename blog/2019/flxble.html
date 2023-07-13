@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <title>
+    ブログエンジンを自作した - SevenColoured
+  </title>
+  <meta name="description" content="静的サイトジェネレータ flxble を自作して, ウェブサイトをそれに移行した." />
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="alternate" href="https://7colou.red/rss.xml" title="SevenColoured" type="application/rss+xml">
+  <link rel="shortcut icon" href="https://7colou.red/favicon.png">
+
+  <link rel="stylesheet" type="text/css" href="https://7colou.red/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <link rel="stylesheet" href="https://7colou.red/highlight/styles/default.css">
+  <script src="https://7colou.red/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body class="post-template">
+  <header class="default-header">
+    <nav class="main-nav clearfix">
+      <a class="nav-item" href="https://7colou.red/index.html">Home</a>
+      <a class="nav-item" href="https://7colou.red/blog/index.html">Blog</a>
+      <a class="nav-item" style="float: right;">
+        <iframe src="https://github.com/sponsors/cannorin/button" title="Sponsor cannorin" height="35" width="116" style="border: 0; margin: 0;"></iframe>
+      </a>
+    </nav>
+  </header>
+  
+<span class="nav-cover"></span>
+
+  <div class="site-wrapper">
+    
+<main class="content" role="main">
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">ブログエンジンを自作した</h1>
+      <section class="post-meta">
+        <time class="post-date" datetime="2019-01-16T10:41:45.6670000">
+            <a href="https://7colou.red/blog/archive/2019-1.html">
+              2019年1月16日水曜日 10:41:45
+            </a>
+        </time>
+        <span class="tags">
+          <strong>Tags: </strong>
+              <a href="https://7colou.red/blog/tag/F%23">F#</a>
+              <a href="https://7colou.red/blog/tag/misc">misc</a>
+              <a href="https://7colou.red/blog/tag/dev">dev</a>
+        </span>
+      </section>
+    </header>
+
+    <section class="post-content">
+      <p>静的サイトジェネレータ <a href="https://github.com/cannorin/flxble">flxble</a> を自作して, ウェブサイトをそれに移行した.</p>
+<p>Markdown プロセッサは <a href="https://github.com/lunet-io/markdig">Markdig</a> を使い, それ以外はテンプレートエンジンも含めて全て F# で自作した.</p>
+<p>現在 1000 記事あるテスト用のブログを全部レンダリングしてタグや月別アーカイブ, RSS まで生成するのに合計 1.7 秒ほどしかかからないので,
+Hugo ほどではないが十分高速なブログエンジンの部類に入るだろう.</p>
+<p>他の多くのテンプレートエンジンと違ってわたしの自作したテンプレートエンジンは内部で mutable state を使っていないので<a id="fnref:1" href="#fn:1" class="footnote-ref"><sup>1</sup></a>, 自動的にスレッドセーフになっている.</p>
+<p>そのお陰で安全に並列化できるのだが, 並列化しなくても既存の end-user<a id="fnref:2" href="#fn:2" class="footnote-ref"><sup>2</sup></a> .NET テンプレートエンジンの中で<a href="https://github.com/cannorin/flxble/wiki/Flxble.Templating:-Benchmarks">おそらく最速</a>になってしまった.</p>
+<p>せっかくなので Hugo にも勝ちたいが, プロファイラにかけたところ, 実行時間のほどんどを Markdig の Markdown パーシング・レンダリングが占めていたので,
+自分で書いた部分をいくら弄ってもこれ以上速くなる望みがあまりないことがわかった.</p>
+<p>さすがに Markdown 処理系を自作したくはない.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn:1">
+<p>F# の標準ライブラリの <code>List</code> や <code>Map</code> はすべて immutable なので, 何も考えてなくても勝手にスレッドセーフになる. ここらへんは ML 系言語の面目躍如ではないだろうか.<a href="#fnref:1" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>独自のスクリプト言語を採用しているなどの理由で任意コードの実行ができず, エンドユーザに使わせても安全なもの. Razor は無制限で C# を使えるのでこの枠には入らない.<a href="#fnref:2" class="footnote-back-ref">&#8617;</a></p>
+</li>
+</ol>
+</div>
+
+    </section>
+    <hr />
+    <section>
+      <script src="https://utteranc.es/client.js"
+              repo="cannorin/cannorin.github.io"
+              branch="master"
+              issue-term="title"
+              async>
+      </script>
+    </section> 
+
+    <footer class="post-footer">
+      <section class="share">
+        <h4>Share</h4>
+        <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=%E3%83%96%E3%83%AD%E3%82%B0%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%B3%E3%82%92%E8%87%AA%E4%BD%9C%E3%81%97%E3%81%9F%20-%20SevenColoured"
+           onclick="window.open(this.href+' '+window.location.href, 'twitter-share', 'width=550,height=235');return false;">
+          <span class="hidden">Twitter</span>
+        </a>
+        <a href="https://mastoshare.net/post.php?text=%E3%83%96%E3%83%AD%E3%82%B0%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%B3%E3%82%92%E8%87%AA%E4%BD%9C%E3%81%97%E3%81%9F%20-%20SevenColoured" onclick="window.open(this.href+' '+window.location.href, '', 'width=500,height=400'); return false;"><img src="https://mastoshare.net/img/toot.svg" width="75" height="20"></a>
+      </section>
+    </footer>
+
+    &nbsp;
+  </article>
+</main>
+
+<aside class="read-next">
+  <a class="read-next-story prev" href="https://7colou.red/blog/2018/07-07-difference/index.html">
+    <section class="post">
+      <h2> Dependent Types と Refinement Types の違い </h2>
+      <section class="post-excerpt">
+        Dependent Types (依存型) と Refinement Types (篩型) は目指すところは似ているが, 導入スタイルに根本的な違いがある.
+      </section>
+    </section>
+  </a>
+  <a class="read-next-story" href="https://7colou.red/blog/2019/ionide-vim.html">
+    <section class="post">
+      <h2> Ionide-vim のメンテナになりました </h2>
+      <section class="post-excerpt">
+        がんばります
+      </section>
+    </section>
+  </a>
+</aside>
+
+  </div>
+
+  <footer class="site-footer clearfix">
+    <section class="copyright">
+      <p>
+        Articles are licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> (unless explicitly mentioned)
+      </p>
+      <p>
+        Code examples are licensed under the <a href="https://directory.fsf.org/wiki/License:Expat">Expat(MIT) license</a>.
+      </p>
+      <p style="text-align:left;margin-top:10px;"><img src="https://7colou.red/img/by-sa.png" alt="CC BY-SA 3.0"/></p>
+    </section>
+    <section class="poweredby">
+      <p>
+        This site is powered by <a href="https://github.com/cannorin/flxble">Flxble</a>,
+        and <a href="https://7colou.red/blog/2019/flxble.html">it's my own blog engine!</a>
+      </p>
+    </section>
+  </footer>
+
+  <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/jquery.fitvids.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/index.js"></script>
+
+</body>
+</html>

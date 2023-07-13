@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <title>
+    Dependent Types と Refinement Types の違い - SevenColoured
+  </title>
+  <meta name="description" content="Dependent Types (依存型) と Refinement Types (篩型) は目指すところは似ているが, 導入スタイルに根本的な違いがある." />
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="alternate" href="https://7colou.red/rss.xml" title="SevenColoured" type="application/rss+xml">
+  <link rel="shortcut icon" href="https://7colou.red/favicon.png">
+
+  <link rel="stylesheet" type="text/css" href="https://7colou.red/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <link rel="stylesheet" href="https://7colou.red/highlight/styles/default.css">
+  <script src="https://7colou.red/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body class="post-template">
+  <header class="default-header">
+    <nav class="main-nav clearfix">
+      <a class="nav-item" href="https://7colou.red/index.html">Home</a>
+      <a class="nav-item" href="https://7colou.red/blog/index.html">Blog</a>
+      <a class="nav-item" style="float: right;">
+        <iframe src="https://github.com/sponsors/cannorin/button" title="Sponsor cannorin" height="35" width="116" style="border: 0; margin: 0;"></iframe>
+      </a>
+    </nav>
+  </header>
+  
+<span class="nav-cover"></span>
+
+  <div class="site-wrapper">
+    
+<main class="content" role="main">
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">Dependent Types と Refinement Types の違い</h1>
+      <section class="post-meta">
+        <time class="post-date" datetime="2018-07-07T05:42:46.0000000">
+            <a href="https://7colou.red/blog/archive/2018-7.html">
+              2018年7月7日土曜日 5:42:46
+            </a>
+        </time>
+        <span class="tags">
+          <strong>Tags: </strong>
+              <a href="https://7colou.red/blog/tag/type%20system">type system</a>
+              <a href="https://7colou.red/blog/tag/type%20theory">type theory</a>
+        </span>
+      </section>
+    </header>
+
+    <section class="post-content">
+      <p>自分の tweets.zip をみてたら発掘された文章.</p>
+<p>Dependent Types (依存型) と Refinement Types (篩型) は目指すところは似ているが, 導入スタイルに根本的な違いがある.</p>
+<h2 id="tldr">TL;DR</h2>
+<p>Refinement types は (Curry-style typing のように) extrinsic で, Dependent types は (Church-style typing のように) intrinsic である.</p>
+<h2 id="section">前提</h2>
+<p>一般に, プログラム言語への型の導入スタイルには Curry-style と Church-style の2種類がある.</p>
+<ul>
+<li><p>Curry-style: 型付けは <em>既に存在する項を</em> 分類するもの</p>
+</li>
+<li><p>Church-style: <em>項が存在するとは</em> 型付けされているということ</p>
+</li>
+</ul>
+<p>前者は動的型付き言語での型アノテーションなどが当てはまり, 型アノテーションを全部取り除いたとしてもプログラムの意味は全く変わらない. それは型というものが <em>外因的に(extrinsically)</em> 追加されたものだから.</p>
+<p>後者は一般的な静的型付き言語が当てはまり, その中では型検査が通らないプログラムは invalid である. それは型というものがそもそも言語の一部 (計算対象となる &quot;項&quot;) であり, <em>内因的に(intrinsically)</em> 存在しているものだから.</p>
+<h2 id="dependent-types">Dependent Types</h2>
+<p>Dependent types とは, 項に <em>依存して</em> 決まる型である.</p>
+<p>たとえば, Idris における固定長リスト(ベクトル)の定義は次のような形をしている.</p>
+<pre><code class="language-haskell">data Vect : Nat -&gt; Type -&gt; Type where
+  Nil  : Vect Z a
+  (::) : a -&gt; Vect n a -&gt; Vect (S n) a
+</code></pre>
+<p>ここで <code>Vect</code> は型変数 <code>a</code> だけでなく, リストの長さを表す自然数 <code>n</code> をパラメータとして取る. すなわち自然数の項が与えられなければ型を構成できない. この点で型 <code>Vect</code> は項に依存しているといえる.</p>
+<p>なお一般に普通の関数は項に依存する項, 多相型を持つ項は型に依存する項, 型コンストラクタは型に依存する型であり, dependent types はこの関係性のぽっかり空いた穴を埋める存在でもある.</p>
+<h2 id="refinement-types">Refinement Types</h2>
+<p>Refinement types とは型を述語で <em>修飾する</em> ものである.</p>
+<p>たとえば, Liquid Haskell において <code>Data.Vector</code> を長さで修飾するには次のようにする.</p>
+<pre><code class="language-haskell">module spec Data.Vector where
+
+import GHC.Base
+
+measure vlen   ::   (Vector a) -&gt; Int
+assume  length :: x:(Vector a) -&gt; {v: Int | v = (vlen x)}
+assume  !      :: x:(Vector a) -&gt; {v: Int | 0 &lt;= v &amp;&amp; v &lt; (vlen x)} -&gt; a
+</code></pre>
+<p>ここでは <code>Vector a</code> の持つ property として <code>vlen</code> を定義しており(制約中に書けるように), <code>length</code> 関数で得られる値が <code>vlen</code> と等しいこと, <code>!</code> 関数でインデックスアクセスをするときはインデックスが 0 以上 <code>vlen</code> 未満であることをそれぞれ仮定している.</p>
+<p>Dependent types と大きく違うのは, こちらでは(実行時に)行われるのは本来の <code>Data.Vector</code> の動作そのものであり, ここで定義したこととは何も関係がないし, 取り除いても全く同じ動作をする. また本来の <code>Data.Vector</code> の実装を検証しているわけでももちろんない.</p>
+<h2 id="section-1">つまり</h2>
+<p>Dependent types は言語の一部である. 一方, refinement types は言語の外側にある. この関係は Church-style typing と Curry-style typing との関係と同じかたちをしている.</p>
+<p>そもそも Curry-style は型なしの項を <em>修飾</em> しているものであるから, refinement terms と呼ぶこともできる. 一方 Church-style を雑に (type-)dependent terms と呼んでもそんなに間違ってはいないだろう(そもそも term/value-dependent types である).</p>
+<p>これを使えば, プログラム言語のスタイルを dependent/refinement, types/terms で 2x2 通り (+依存型も篩型もないもの) に大まかに分類することができる.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>D. Types</th>
+<th>R. Types</th>
+<th>(None)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>D. Terms</strong></td>
+<td>Dependent ML</td>
+<td>Liquid Haskell</td>
+<td>(ML)</td>
+</tr>
+<tr>
+<td><strong>R. Terms</strong></td>
+<td>NuPRL</td>
+<td>???</td>
+<td>(LISP)</td>
+</tr>
+</tbody>
+</table>
+<p>なお, dependent types と refinement types を両方持っていてもよく, F* などがそのような言語で実用的なものの例である.</p>
+
+    </section>
+    <hr />
+    <section>
+      <script src="https://utteranc.es/client.js"
+              repo="cannorin/cannorin.github.io"
+              branch="master"
+              issue-term="title"
+              async>
+      </script>
+    </section> 
+
+    <footer class="post-footer">
+      <section class="share">
+        <h4>Share</h4>
+        <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=Dependent%20Types%20%E3%81%A8%20Refinement%20Types%20%E3%81%AE%E9%81%95%E3%81%84%20-%20SevenColoured"
+           onclick="window.open(this.href+' '+window.location.href, 'twitter-share', 'width=550,height=235');return false;">
+          <span class="hidden">Twitter</span>
+        </a>
+        <a href="https://mastoshare.net/post.php?text=Dependent%20Types%20%E3%81%A8%20Refinement%20Types%20%E3%81%AE%E9%81%95%E3%81%84%20-%20SevenColoured" onclick="window.open(this.href+' '+window.location.href, '', 'width=500,height=400'); return false;"><img src="https://mastoshare.net/img/toot.svg" width="75" height="20"></a>
+      </section>
+    </footer>
+
+    &nbsp;
+  </article>
+</main>
+
+<aside class="read-next">
+  <a class="read-next-story prev" href="https://7colou.red/blog/2018/03-08-fsharp-type-level-computation/index.html">
+    <section class="post">
+      <h2> F# で型レベルプログラミング </h2>
+      <section class="post-excerpt">
+        今F# で依存型をシミュレートしようと頑張ってるのだけど、その途中でちょっと面白いことができたのでそこだけ切り出してまとめておく。
+      </section>
+    </section>
+  </a>
+  <a class="read-next-story" href="https://7colou.red/blog/2019/flxble.html">
+    <section class="post">
+      <h2> ブログエンジンを自作した </h2>
+      <section class="post-excerpt">
+        静的サイトジェネレータ flxble を自作して, ウェブサイトをそれに移行した.
+      </section>
+    </section>
+  </a>
+</aside>
+
+  </div>
+
+  <footer class="site-footer clearfix">
+    <section class="copyright">
+      <p>
+        Articles are licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> (unless explicitly mentioned)
+      </p>
+      <p>
+        Code examples are licensed under the <a href="https://directory.fsf.org/wiki/License:Expat">Expat(MIT) license</a>.
+      </p>
+      <p style="text-align:left;margin-top:10px;"><img src="https://7colou.red/img/by-sa.png" alt="CC BY-SA 3.0"/></p>
+    </section>
+    <section class="poweredby">
+      <p>
+        This site is powered by <a href="https://github.com/cannorin/flxble">Flxble</a>,
+        and <a href="https://7colou.red/blog/2019/flxble.html">it's my own blog engine!</a>
+      </p>
+    </section>
+  </footer>
+
+  <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/jquery.fitvids.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/index.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,318 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <title>
+    [Qiita] 任意長のタプルをサポートする SRTP 制約の書き方 - SevenColoured
+  </title>
+  <meta name="description" content="あんまり一般受けするようなネタが思いつかなかったので，SRTP をゴリゴリ書いてる人向けの記事になってしまいました．ごめんなさい……" />
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="alternate" href="https://7colou.red/rss.xml" title="SevenColoured" type="application/rss+xml">
+  <link rel="shortcut icon" href="https://7colou.red/favicon.png">
+
+  <link rel="stylesheet" type="text/css" href="https://7colou.red/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <link rel="stylesheet" href="https://7colou.red/highlight/styles/default.css">
+  <script src="https://7colou.red/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body class="post-template">
+  <header class="default-header">
+    <nav class="main-nav clearfix">
+      <a class="nav-item" href="https://7colou.red/index.html">Home</a>
+      <a class="nav-item" href="https://7colou.red/blog/index.html">Blog</a>
+      <a class="nav-item" style="float: right;">
+        <iframe src="https://github.com/sponsors/cannorin/button" title="Sponsor cannorin" height="35" width="116" style="border: 0; margin: 0;"></iframe>
+      </a>
+    </nav>
+  </header>
+  
+<span class="nav-cover"></span>
+
+  <div class="site-wrapper">
+    
+<main class="content" role="main">
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">[Qiita] 任意長のタプルをサポートする SRTP 制約の書き方</h1>
+      <section class="post-meta">
+        <time class="post-date" datetime="2019-12-25T00:00:00.0000000">
+            <a href="https://7colou.red/blog/archive/2019-12.html">
+              2019年12月25日水曜日 0:00:00
+            </a>
+        </time>
+        <span class="tags">
+          <strong>Tags: </strong>
+              <a href="https://7colou.red/blog/tag/F%23">F#</a>
+              <a href="https://7colou.red/blog/tag/advent">advent</a>
+              <a href="https://7colou.red/blog/tag/qiita">qiita</a>
+        </span>
+      </section>
+    </header>
+
+    <section class="post-content">
+      <blockquote>
+<p>この記事は <a href="https://qiita.com/cannorin/items/aaf6abb2a7c1bc7793d4">以前 Qiita に投稿した記事</a> の転載です．</p>
+</blockquote>
+<p>あんまり一般受けするようなネタが思いつかなかったので，SRTP をゴリゴリ書いてる人向けの記事になってしまいました．ごめんなさい……</p>
+<p>FSharpPlus で現在開発中の，<a href="https://github.com/fsprojects/FSharpPlus/pull/192">型レベルリテラルでの依存型エミュレーション</a> で用いた技法です．</p>
+<h2 id="section">タプル型の内部表現</h2>
+<p>F# においてタプル型は，</p>
+<ul>
+<li>7-tuple までは <code>System.Tuple</code> の1〜7個版を用いる．</li>
+<li>8-tuple 以上は <code>Sytem.Tuple`8</code> の8個目に，8番目以降の要素をネストさせて入れる．ちょうど 8-tuple の場合は，8番目は <code>System.Tuple`1</code> に入れる．</li>
+</ul>
+<p>という内部表現になっている．例えば，</p>
+<ul>
+<li><code>int*int*int</code> は <code>System.Tuple`3[System.Int32,System.Int32,System.Int32]</code></li>
+<li><code>int*int*int*int*int*int*int*int</code> は <code>System.Tuple`8[.., System.Tuple`2[System.Int32, System.Int32]]</code></li>
+</ul>
+<p>となる．単純な型レベルリストになっていないので SRTP で分解・構成するのは難しい．</p>
+<p>しかも面倒なことに，F# の型システム上ではタプルと <code>System.Tuple</code> による表現は <strong>8-tuple 以上の時のみ</strong> 区別される．つまり，以下のようになる:</p>
+<pre><code class="language-fsharp">&gt; let (a,b,c) = System.Tuple&lt;_,_,_&gt;(1,2,3);;
+val c : int = 3
+val b : int = 2
+val a : int = 1
+
+&gt; let (a,b,c,d,e,f,g,h) = System.Tuple&lt;_,_,_,_,_,_,_,_&gt;(1,2,3,4,5,6,7,System.Tuple&lt;_&gt;(8));;
+
+  let (a,b,c,d,e,f,g,h) = System.Tuple&lt;_,_,_,_,_,_,_,_&gt;(1,2,3,4,5,6,7,System.Tuple&lt;_&gt;(8));;
+  ------------------------^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/home/alice/stdin(17,25): error FS0001: This expression was expected to have type
+    ''a * 'b * 'c * 'd * 'e * 'f * 'g * 'h'
+but here has type
+    'System.Tuple&lt;int,int,int,int,int,int,int,System.Tuple&lt;int&gt;&gt;'
+
+</code></pre>
+<p>つまり，<code>Sytem.Tuple`8</code> で n-tuple (n&gt;7) の内部表現を作っても，それを n-tuple 型として扱うことはできない．</p>
+<h2 id="retype">黒魔術 <code>retype</code></h2>
+<p>そこで，undocumented な機能である inline IL を使って，内部的に同一であるような型を無理やり同一視する．</p>
+<p>inline IL は <code>(# .. #)</code> で囲った中に直接 IL やその他の低レベル命令を書ける機能で，本来は標準ライブラリである <code>FSharp.Core</code> の内部でしか使うことができない．</p>
+<pre><code class="language-fsharp">#nowarn &quot;0042&quot;
+let inline internal retype (x: 'T) : 'U =
+  (# &quot;&quot; x: 'U #)
+</code></pre>
+<p>この関数 <code>retype</code> は，<code>'T</code> 型の値 <code>x</code> を無理やり <code>'U</code> 型として解釈する．キャストを行うわけではない (=型の内部表現を変えるわけではない) ので，OCaml の <code>Obj.magic</code> に近い挙動だ．</p>
+<p>これを使ってやれば先ほどの例を動くようにできる．</p>
+<pre><code class="language-fsharp">&gt; let (a:int,b:int,c:int,d:int,e:int,f:int,g:int,h:int) =
+-   retype &lt;| System.Tuple&lt;_,_,_,_,_,_,_,_&gt;(1,2,3,4,5,6,7,System.Tuple&lt;_&gt;(8));;
+val h : int = 8
+val g : int = 7
+val f : int = 6
+val e : int = 5
+val d : int = 4
+val c : int = 3
+val b : int = 2
+val a : int = 1
+</code></pre>
+<p>ただし，<code>val inline internal retype : x:'T -&gt; 'U</code> なので，変換先の型がわかっている必要があり，それを注釈で明示してあげないといけない．</p>
+<h2 id="section-1">タプルを分解する</h2>
+<p>タプルを構成する方法はわかったので，分解もしてみよう．</p>
+<p>まず，n-tuple (n&gt;7) 以上全てにマッチするオーバーロードを書くために，以下のヘルパー関数を導入する．</p>
+<pre><code class="language-fsharp">let inline whenNestedTuple (t: 't) = 
+  (^t: (member Item1: 't1) t), (^t: (member Item2: 't2) t), (^t: (member Item3: 't3) t),
+  (^t: (member Item4: 't4) t), (^t: (member Item5: 't5) t), (^t: (member Item6: 't6) t),
+  (^t: (member Item7: 't7) t), (^t: (member Rest: 'tr) t)
+
+// val inline whenNestedTuple :
+//   t: ^t -&gt; 't1 * 't2 * 't3 * 't4 * 't5 * 't6 * 't7 * 'tr
+//     when  ^t : (member get_Item1 :  ^t -&gt; 't1) and
+//           ^t : (member get_Item2 :  ^t -&gt; 't2) and
+//           ^t : (member get_Item3 :  ^t -&gt; 't3) and
+//           ^t : (member get_Item4 :  ^t -&gt; 't4) and
+//           ^t : (member get_Item5 :  ^t -&gt; 't5) and
+//           ^t : (member get_Item6 :  ^t -&gt; 't6) and
+//           ^t : (member get_Item7 :  ^t -&gt; 't7) and
+//           ^t : (member get_Rest :  ^t -&gt; 'tr)
+</code></pre>
+<p>これは，<code>System.Tuple`8</code> には7番目の要素までに対応する <code>Item1</code> ~ <code>Item7</code> というプロパティと8番目の要素が入った <code>Rest</code> というプロパティがあることを利用して，それぞれを分解するための関数だ．
+わざわざ member constraints を使って書いているのは，SRTP は内部表現の型のみを見るので，8-tuple でも 9-tuple でも使えるからだ．</p>
+<pre><code class="language-fsharp">&gt; whenNestedTuple (1,2,3,4,5,6,7,8,9);;
+val it : int * int * int * int * int * int * int * (int * int) =
+  (1, 2, 3, 4, 5, 6, 7, (8, 9))
+</code></pre>
+<p>あとは 8-tuple 以上のケースを <code>whenNestedTuple</code> を使ったオーバーロードにマッチさせて，いつものように SRTP を書いていくだけだ．</p>
+<h2 id="arity">例1: タプルの arity を数える</h2>
+<pre><code class="language-fsharp">type CountTuple =
+  static member inline Invoke xs : int =
+    let inline call_2 (a: ^a, b: ^b) = ((^a or ^b) : (static member CountTuple: _*_ -&gt; _) b, a)
+    let inline call (a: 'a, b: 'b) = call_2 (a, b)
+    call (Unchecked.defaultof&lt;CountTuple&gt;, xs)
+
+  static member inline CountTuple (t: 't, ct: ^CountTuple) =
+    let _,_,_,_,_,_,_,tr : _*_*_*_*_*_*_* ^TR = whenNestedTuple t
+    7 + ((^TR or ^CountTuple): (static member CountTuple: _*_-&gt;_) tr,ct)
+
+  static member inline CountTuple (_: Tuple&lt;_&gt;, _: CountTuple) = 1
+  static member inline CountTuple ((_, _), _: CountTuple) = 2
+  static member inline CountTuple ((_, _, _), _: CountTuple) = 3
+  static member inline CountTuple ((_, _, _, _), _: CountTuple) = 4
+  static member inline CountTuple ((_, _, _, _, _), _: CountTuple) = 5
+  static member inline CountTuple ((_, _, _, _, _, _), _: CountTuple) = 6
+  static member inline CountTuple ((_, _, _, _, _, _, _), _: CountTuple) = 7
+</code></pre>
+<p>使用例:</p>
+<pre><code class="language-fsharp">&gt; CountTuple.Invoke (1,2,3,4,5);;
+val it : int = 5
+
+&gt; CountTuple.Invoke (1,2,3,4,5,6,7,8,9,0,1,2);;
+val it : int = 12
+</code></pre>
+<h2 id="section-2">例2: 同じ型のみのタプルをリストに変換する</h2>
+<pre><code class="language-fsharp">type TupleToList =
+  static member inline Invoke xs : 'x list =
+    let inline call_2 (a: ^a, b: ^b) = ((^a or ^b) : (static member TupleToList: _*_ -&gt; _) b, a)
+    let inline call (a: 'a, b: 'b) = call_2 (a, b)
+    call (Unchecked.defaultof&lt;TupleToList&gt;, xs)
+
+  static member inline TupleToList (t: 't, ct: ^TupleToList) =
+    let t1,t2,t3,t4,t5,t6,t7,tr : _*_*_*_*_*_*_* ^TR = whenNestedTuple t
+    t1::t2::t3::t4::t5::t6::t7::((^TR or ^TupleToList): (static member TupleToList: _*_-&gt;_) tr,ct)
+
+  static member inline TupleToList (x: Tuple&lt;_&gt;, _: TupleToList) = [x.Item1]
+  static member inline TupleToList ((x1,x2), _: TupleToList) = [x1;x2]
+  static member inline TupleToList ((x1,x2,x3), _: TupleToList) = [x1;x2;x3]
+  static member inline TupleToList ((x1,x2,x3,x4), _: TupleToList) = [x1;x2;x3;x4]
+  static member inline TupleToList ((x1,x2,x3,x4,x5), _: TupleToList) = [x1;x2;x3;x4;x5]
+  static member inline TupleToList ((x1,x2,x3,x4,x5,x6), _: TupleToList) = [x1;x2;x3;x4;x5;x6]
+  static member inline TupleToList ((x1,x2,x3,x4,x5,x6,x7), _: TupleToList) = [x1;x2;x3;x4;x5;x6;x7]
+</code></pre>
+<p>使用例:</p>
+<pre><code class="language-fsharp">&gt; TupleToList.Invoke (1,2,3);;
+val it : int list = [1; 2; 3]
+
+&gt; TupleToList.Invoke (1,2,3,4,5,6,7,8,9);;
+val it : int list = [1; 2; 3; 4; 5; 6; 7; 8; 9]
+</code></pre>
+<h2 id="arity-1">例3: 型レベル自然数に応じた arity のタプルを作る</h2>
+<p><code>retype</code> を使ってタプルを構成する例．</p>
+<pre><code class="language-fsharp">type S&lt;'a&gt; = S of 'a with static member Succ (S n) = S (S n)
+type Z = Z with static member Succ Z = S Z
+
+let inline succ (n: ^n) = (^n: (static member Succ:_-&gt;_) n)
+
+type ArrayToTuple =
+  static member inline Invoke (xs: 'x[], n, ?index) =
+    let inline call_2 (_a: ^a, b: ^b) = ((^a or ^b): (static member ArrayToTuple:_*_*_-&gt;_) xs,b,defaultArg index 0)
+    let inline call (a: 'a, b: 'b) = call_2 (a, b)
+    call (Unchecked.defaultof&lt;ArrayToTuple&gt;, n) |&gt; retype
+
+  static member inline ArrayToTuple (xs:_[],S(S(S(S(S(S(S(S(n)))))))), i) =
+    Tuple&lt;_,_,_,_,_,_,_,_&gt;(
+      xs.[i],xs.[i+1],xs.[i+2],xs.[i+3],xs.[i+4],xs.[i+5],xs.[i+6],
+      ArrayToTuple.Invoke(xs,succ n,i+7) // ここで S n とすると &quot;早すぎるオーバーロード解決&quot; が起こってしまう
+    )
+
+  static member inline ArrayToTuple (xs:_[], S Z, i) = Tuple&lt;_&gt;(xs.[i])
+  static member inline ArrayToTuple (xs:_[], S (S Z), i) = (xs.[i], xs.[i+1])
+  static member inline ArrayToTuple (xs:_[], S (S (S Z)), i) = (xs.[i], xs.[i+1], xs.[i+2])
+  static member inline ArrayToTuple (xs:_[], S (S (S (S Z))), i) = (xs.[i], xs.[i+1], xs.[i+2], xs.[i+3])
+  static member inline ArrayToTuple (xs:_[], S (S (S (S (S Z)))), i) = (xs.[i], xs.[i+1], xs.[i+2], xs.[i+3], xs.[i+4])
+  static member inline ArrayToTuple (xs:_[], S (S (S (S (S (S Z))))), i) = (xs.[i], xs.[i+1], xs.[i+2], xs.[i+3], xs.[i+4], xs.[i+5])
+  static member inline ArrayToTuple (xs:_[], S (S (S (S (S (S (S Z)))))), i) = (xs.[i], xs.[i+1], xs.[i+2], xs.[i+3], xs.[i+4], xs.[i+5], xs.[i+6])
+</code></pre>
+<p>使用例:</p>
+<pre><code class="language-fsharp">&gt; let (a:int,b:int,c:int) = ArrayToTuple.Invoke ([|1;2;3|], S(S(S(Z))));;
+val c : int = 3
+val b : int = 2
+val a : int = 1
+
+
+&gt; let (a:int,b:int,c:int,d:int,e:int,f:int,g:int,h:int,i:int,j:int) =
+-   ArrayToTuple.Invoke ([|1;2;3;4;5;6;7;8;9;10|], S(S(S(S(S(S(S(S(S(S(Z)))))))))));;
+val j : int = 10
+val i : int = 9
+val h : int = 8
+val g : int = 7
+val f : int = 6
+val e : int = 5
+val d : int = 4
+val c : int = 3
+val b : int = 2
+val a : int = 1
+</code></pre>
+<h2 id="section-3">はい</h2>
+<p>よかったですね</p>
+
+    </section>
+    <hr />
+    <section>
+      <script src="https://utteranc.es/client.js"
+              repo="cannorin/cannorin.github.io"
+              branch="master"
+              issue-term="title"
+              async>
+      </script>
+    </section> 
+
+    <footer class="post-footer">
+      <section class="share">
+        <h4>Share</h4>
+        <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=%5BQiita%5D%20%E4%BB%BB%E6%84%8F%E9%95%B7%E3%81%AE%E3%82%BF%E3%83%97%E3%83%AB%E3%82%92%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%E3%81%99%E3%82%8B%20SRTP%20%E5%88%B6%E7%B4%84%E3%81%AE%E6%9B%B8%E3%81%8D%E6%96%B9%20-%20SevenColoured"
+           onclick="window.open(this.href+' '+window.location.href, 'twitter-share', 'width=550,height=235');return false;">
+          <span class="hidden">Twitter</span>
+        </a>
+        <a href="https://mastoshare.net/post.php?text=%5BQiita%5D%20%E4%BB%BB%E6%84%8F%E9%95%B7%E3%81%AE%E3%82%BF%E3%83%97%E3%83%AB%E3%82%92%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%E3%81%99%E3%82%8B%20SRTP%20%E5%88%B6%E7%B4%84%E3%81%AE%E6%9B%B8%E3%81%8D%E6%96%B9%20-%20SevenColoured" onclick="window.open(this.href+' '+window.location.href, '', 'width=500,height=400'); return false;"><img src="https://mastoshare.net/img/toot.svg" width="75" height="20"></a>
+      </section>
+    </footer>
+
+    &nbsp;
+  </article>
+</main>
+
+<aside class="read-next">
+  <a class="read-next-story prev" href="https://7colou.red/blog/2019/kisc-advent.html">
+    <section class="post">
+      <h2> 部室 Wi-Fi を支える技術 </h2>
+      <section class="post-excerpt">
+        認証コンセントはクソ
+      </section>
+    </section>
+  </a>
+  <a class="read-next-story" href="https://7colou.red/blog/2020/fsharp-advent.html">
+    <section class="post">
+      <h2> F# で型クラス 2020 </h2>
+      <section class="post-excerpt">
+        そろそろ F# での型クラスの実用的な作り方について書いておく
+      </section>
+    </section>
+  </a>
+</aside>
+
+  </div>
+
+  <footer class="site-footer clearfix">
+    <section class="copyright">
+      <p>
+        Articles are licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> (unless explicitly mentioned)
+      </p>
+      <p>
+        Code examples are licensed under the <a href="https://directory.fsf.org/wiki/License:Expat">Expat(MIT) license</a>.
+      </p>
+      <p style="text-align:left;margin-top:10px;"><img src="https://7colou.red/img/by-sa.png" alt="CC BY-SA 3.0"/></p>
+    </section>
+    <section class="poweredby">
+      <p>
+        This site is powered by <a href="https://github.com/cannorin/flxble">Flxble</a>,
+        and <a href="https://7colou.red/blog/2019/flxble.html">it's my own blog engine!</a>
+      </p>
+    </section>
+  </footer>
+
+  <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/jquery.fitvids.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/index.js"></script>
+
+</body>
+</html>

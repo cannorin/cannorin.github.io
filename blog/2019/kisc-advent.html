@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <title>
+    部室 Wi-Fi を支える技術 - SevenColoured
+  </title>
+  <meta name="description" content="認証コンセントはクソ" />
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="alternate" href="https://7colou.red/rss.xml" title="SevenColoured" type="application/rss+xml">
+  <link rel="shortcut icon" href="https://7colou.red/favicon.png">
+
+  <link rel="stylesheet" type="text/css" href="https://7colou.red/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <link rel="stylesheet" href="https://7colou.red/highlight/styles/default.css">
+  <script src="https://7colou.red/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body class="post-template">
+  <header class="default-header">
+    <nav class="main-nav clearfix">
+      <a class="nav-item" href="https://7colou.red/index.html">Home</a>
+      <a class="nav-item" href="https://7colou.red/blog/index.html">Blog</a>
+      <a class="nav-item" style="float: right;">
+        <iframe src="https://github.com/sponsors/cannorin/button" title="Sponsor cannorin" height="35" width="116" style="border: 0; margin: 0;"></iframe>
+      </a>
+    </nav>
+  </header>
+  
+<span class="nav-cover"></span>
+
+  <div class="site-wrapper">
+    
+<main class="content" role="main">
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">部室 Wi-Fi を支える技術</h1>
+      <section class="post-meta">
+        <time class="post-date" datetime="2019-12-22T00:00:00.0000000">
+            <a href="https://7colou.red/blog/archive/2019-12.html">
+              2019年12月22日日曜日 0:00:00
+            </a>
+        </time>
+        <span class="tags">
+          <strong>Tags: </strong>
+              <a href="https://7colou.red/blog/tag/misc">misc</a>
+              <a href="https://7colou.red/blog/tag/advent">advent</a>
+        </span>
+      </section>
+    </header>
+
+    <section class="post-content">
+      <p>この記事は <a href="https://adventar.org/calendars/4690">Kobe University Advent Calendar 2019</a> の22日目です．</p>
+<h2 id="section">部室のネットワーク環境の惨状</h2>
+<p>我々の部室には大学の無線LANが届かず，有線LANポートが1個しかない．そこで自分で無線LANアクセスポイントを建ててみんなで使えるようにする必要があるが，それがめちゃくちゃ大変という話です．</p>
+<h2 id="ieee-802.1x">IEEE 802.1X認証という壁</h2>
+<p>雑にルータぶっさせばいいじゃんと思われるかもしれないが，それでは全く動かない．そんなに単純な話ではないのだ．</p>
+<p>弊学のインターネット環境は <strong>IEEE 802.1X</strong> 認証というものを採用している．
+これは認証されたクライアントしかネットワークに接続できなくするための技術で，以下のようになっている．</p>
+<p><a title="Arran Cudbard-Bell Arr2036 [GFDL (http://www.gnu.org/copyleft/fdl.html)], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:802.1X_wired_protocols.png"><img width="256" alt="802.1X wired protocols" src="https://upload.wikimedia.org/wikipedia/commons/1/1f/802.1X_wired_protocols.png"></a></p>
+<p>Authenticator というのは認証用の LAN スイッチで，部室には存在してないし，Authentication Server と通信するための secret key がわからないので自分で用意することもできない．
+つまりどういうことかというと，<strong>まともな手段では同時に一人しかネットワークに接続できない</strong> ということだ．ゴミ</p>
+<h2 id="openvpn">回避策: OpenVPN</h2>
+<p>まず，認証を突破するために <strong>誰か（のアカウント）に人柱になってもらう</strong>．</p>
+<p>次に，接続した PC をアクセスポイントかつ OpenVPN Client にする．</p>
+<p>そしてインターネット上に専用の OpenVPN Server を用意し，そこに接続する．</p>
+<p>すると，アクセスポイント化した PC に他の PC を接続することで，インターネットにアクセスできるようになる．</p>
+<p>図で説明すると以下のようである：</p>
+<p><img src="https://i.imgur.com/oRCaDIy.png" alt="図" /></p>
+<p>Authenticator は MAC アドレス等で端末を識別しているようだが，VPN によってクライアント PC からのパケットは人柱 PC からのフレームの中に包まれるため，全て人柱 PC からの通信となって認証を突破することができる．</p>
+<h2 id="section-1">ハマった（てる）ところ</h2>
+<h3 id="udp-123-ntp-openvpn-wget">UDP 123 (NTP) で OpenVPN サーバを建てていると wget が通らない</h3>
+<p>学内ネットワークでは使えるポートがかなり制限されているので，空いてるポートで UDP が使える UDP 123 を使ってみたが，
+これは本来 NTP が使うポートだ．時刻同期ができなくなるくらい別にいいでしょと思ったら，ping も dig も通るのに
+wget が動かないという謎の現象が発生した．調べても分からなかったので TCP 123 にしたら動いた．ネットワークなんもわからん</p>
+<h3 id="raspi">RasPi を経由させるとさくらのコントロールパネルにアクセスできない</h3>
+<p>意味不明 わからん，なんも……</p>
+<p>次回は Tatamo さんです．</p>
+
+    </section>
+    <hr />
+    <section>
+      <script src="https://utteranc.es/client.js"
+              repo="cannorin/cannorin.github.io"
+              branch="master"
+              issue-term="title"
+              async>
+      </script>
+    </section> 
+
+    <footer class="post-footer">
+      <section class="share">
+        <h4>Share</h4>
+        <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=%E9%83%A8%E5%AE%A4%20Wi-Fi%20%E3%82%92%E6%94%AF%E3%81%88%E3%82%8B%E6%8A%80%E8%A1%93%20-%20SevenColoured"
+           onclick="window.open(this.href+' '+window.location.href, 'twitter-share', 'width=550,height=235');return false;">
+          <span class="hidden">Twitter</span>
+        </a>
+        <a href="https://mastoshare.net/post.php?text=%E9%83%A8%E5%AE%A4%20Wi-Fi%20%E3%82%92%E6%94%AF%E3%81%88%E3%82%8B%E6%8A%80%E8%A1%93%20-%20SevenColoured" onclick="window.open(this.href+' '+window.location.href, '', 'width=500,height=400'); return false;"><img src="https://mastoshare.net/img/toot.svg" width="75" height="20"></a>
+      </section>
+    </footer>
+
+    &nbsp;
+  </article>
+</main>
+
+<aside class="read-next">
+  <a class="read-next-story prev" href="https://7colou.red/blog/2019/ionide-vim.html">
+    <section class="post">
+      <h2> Ionide-vim のメンテナになりました </h2>
+      <section class="post-excerpt">
+        がんばります
+      </section>
+    </section>
+  </a>
+  <a class="read-next-story" href="https://7colou.red/blog/2019/fsharp-advent.html">
+    <section class="post">
+      <h2> [Qiita] 任意長のタプルをサポートする SRTP 制約の書き方 </h2>
+      <section class="post-excerpt">
+        あんまり一般受けするようなネタが思いつかなかったので，SRTP をゴリゴリ書いてる人向けの記事になってしまいました．ごめんなさい……
+      </section>
+    </section>
+  </a>
+</aside>
+
+  </div>
+
+  <footer class="site-footer clearfix">
+    <section class="copyright">
+      <p>
+        Articles are licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> (unless explicitly mentioned)
+      </p>
+      <p>
+        Code examples are licensed under the <a href="https://directory.fsf.org/wiki/License:Expat">Expat(MIT) license</a>.
+      </p>
+      <p style="text-align:left;margin-top:10px;"><img src="https://7colou.red/img/by-sa.png" alt="CC BY-SA 3.0"/></p>
+    </section>
+    <section class="poweredby">
+      <p>
+        This site is powered by <a href="https://github.com/cannorin/flxble">Flxble</a>,
+        and <a href="https://7colou.red/blog/2019/flxble.html">it's my own blog engine!</a>
+      </p>
+    </section>
+  </footer>
+
+  <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/jquery.fitvids.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/index.js"></script>
+
+</body>
+</html>

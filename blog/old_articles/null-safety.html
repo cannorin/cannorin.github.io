@@ -1,0 +1,537 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <title>
+    null 安全についてのポエム - SevenColoured
+  </title>
+  <meta name="description" content="ポエムです 愛や気持ちの話をするので話半分くらいに読んで下さい." />
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="alternate" href="https://7colou.red/rss.xml" title="SevenColoured" type="application/rss+xml">
+  <link rel="shortcut icon" href="https://7colou.red/favicon.png">
+
+  <link rel="stylesheet" type="text/css" href="https://7colou.red/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <link rel="stylesheet" href="https://7colou.red/highlight/styles/default.css">
+  <script src="https://7colou.red/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body class="post-template">
+  <header class="default-header">
+    <nav class="main-nav clearfix">
+      <a class="nav-item" href="https://7colou.red/index.html">Home</a>
+      <a class="nav-item" href="https://7colou.red/blog/index.html">Blog</a>
+      <a class="nav-item" style="float: right;">
+        <iframe src="https://github.com/sponsors/cannorin/button" title="Sponsor cannorin" height="35" width="116" style="border: 0; margin: 0;"></iframe>
+      </a>
+    </nav>
+  </header>
+  
+<span class="nav-cover"></span>
+
+  <div class="site-wrapper">
+    
+<main class="content" role="main">
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">null 安全についてのポエム</h1>
+      <section class="post-meta">
+        <time class="post-date" datetime="2016-12-09T11:32:00.0000000">
+            <a href="https://7colou.red/blog/archive/2016-12.html">
+              2016年12月9日金曜日 11:32:00
+            </a>
+        </time>
+        <span class="tags">
+          <strong>Tags: </strong>
+              <a href="https://7colou.red/blog/tag/programming%20language">programming language</a>
+              <a href="https://7colou.red/blog/tag/poem">poem</a>
+        </span>
+      </section>
+    </header>
+
+    <section class="post-content">
+      <h2 id="section">ポエムです</h2>
+<p>愛や気持ちの話をするので話半分くらいに読んで下さい.</p>
+<p>また多数の方の気分を不愉快にさせてしまう恐れがあり, その場合はすぐにタブを閉じてください.</p>
+<h2 id="null">「null 安全」という言葉</h2>
+<p>そもそも何が「安全」なのだろうか. 「null が安全」なのか「null から安全」なのか.</p>
+<p>これはおそらく「型安全 (type safety)」の語感から来ているのだと思う.</p>
+<p><a href="https://en.wikipedia.org/wiki/Type_safety">Type safety - Wikipedia</a></p>
+<blockquote>
+<p>In computer science, type safety is the extent to which a programming language discourages or prevents type errors.</p>
+</blockquote>
+<blockquote>
+<p>計算機科学において, 型安全性とは, プログラミング言語がどの程度型エラーを (プログラマに) 起こさせないようにするのか, または実際に防止するのか, ということを指す. (私訳)</p>
+</blockquote>
+<p>しかし, <a href="https://www.google.co.jp/search?q=null+safety">Google で &quot;null safety&quot; で調べ</a>ても Kotlin 関連の記事しか出てこない. つまりは Kotlin で初めて使われた言葉ということになる.</p>
+<p>また, 検索結果に <a href="https://en.wikipedia.org/wiki/Void_safety">Void safety - Wikipedia</a> があった.</p>
+<blockquote>
+<p>Void safety is a guarantee within an object-oriented programming language that no object references will have null or void values.</p>
+</blockquote>
+<blockquote>
+<p>Void 安全とは, オブジェクト指向言語において, オブジェクトの参照が null や void といった値を持ちえないことが保証されていることを指す. (私訳)</p>
+</blockquote>
+<p>以上から「null 安全」という言葉の意味を推測してみると, ざっくりと「null エラーを防止するために、あるオブジェクトが null でないことが保証されていること」となるだろう.</p>
+<h2 id="null-1">null とは何だっけ？</h2>
+<p>この場合の null というのは <a href="https://en.wikipedia.org/wiki/Null_pointer">Null pointer - Wikipedia</a> のことである.</p>
+<blockquote>
+<p>In computing, a null pointer has a value reserved for indicating that the pointer does not refer to a valid object.</p>
+</blockquote>
+<blockquote>
+<p>プログラミングにおいて, ヌルポインタとはポインタが有効なオブジェクトを指していないことを示すために予約されたポインタのことである.</p>
+</blockquote>
+<blockquote>
+<p>Programs routinely use null pointers to represent conditions such as the end of a list of unknown length or the failure to perform some action</p>
+</blockquote>
+<blockquote>
+<p>プログラムは, 不定長のリストの終端を表したり, 何らかの処理が失敗したことを表したりする時に, 日常的にヌルポインタを使っている. (私訳)</p>
+</blockquote>
+<p>最近の言語で null をリストの末尾に突っ込むような言語はないし, そんな使い方をする人は誰もいないと思うので, こんにちでは後者の使われ方が主なものだということになる.</p>
+<p>ここで一つ重大な疑問が生じる. それは, <strong>なぜ処理の失敗を表現するためにわざわざ null を使っておいて, それを null 安全を用いて親の敵のように排除しようとしているのか</strong> ということだ.</p>
+<h2 id="null-2">null, 要る？</h2>
+<p>少なくとも, null 安全に魅力を感じるような人はそもそも null が要らないのだ.</p>
+<p>最近の言語は間違いなくポイントフリーな方向に進んでいて, それは彼らがポインタ(とその操作)を憎んでいるからだ.</p>
+<p>彼らは, 帰ってきた結果からある処理が成功したか失敗したかを判断できて, それをもとにエラーが起きないような処理が書ければよいだけなのだ.</p>
+<h2 id="section-1">成功と失敗</h2>
+<blockquote>
+<p>以下は代表的なオブジェクト指向プログラミング言語の一つである C# を用いて解説するが, C# を知らなくてもなるべくわかるように標準ライブラリなどの使用は極力控えている.</p>
+</blockquote>
+<blockquote>
+<p>C# において値型を Nullable にするには <code>int?</code> のように書き, この場合 int 型数値と null の両方を持つことができる.</p>
+</blockquote>
+<p>そんな彼らを扉の陰から見ている, 皆様におなじみの物体がある.</p>
+<p>彼の名は enum だ.</p>
+<pre><code class="language-csharp">enum ServerStatus
+{
+    Idle, Busy, Error
+}
+
+public ServerStatus CheckServerStatus (Server s)
+{
+    try
+    {
+        var res = s.Access();
+        if (res.IsBusy)
+            return ServerStatus.Busy;
+        else
+            return ServerStatus.Idle;
+    }
+    catch
+    {
+        return ServerStatus.Error;
+    }
+}
+</code></pre>
+<p>これは明らかに「null 安全」だ. 定義の煩雑さにさえ目をつぶれば, <code>bool?</code> を使って bool に null の使用を許す必要など全くない.</p>
+<p>しかし, 大抵の場合は Busy か Idle かだけでなく, サーバの接続人数を同時に欲しいものだ.</p>
+<pre><code class="language-csharp">
+class DetailedServerStatus
+{
+    public ServerStatus Status;
+    int _count;
+    public int? ConnectionsCount
+    {
+        get
+        {
+            switch(Status)
+            {
+                case ServerStatus.Idle:
+                case ServerStatus.Busy:
+                    return (int?)_count;
+                case ServerStatus.Error:
+                    return null;
+        }
+    }
+}
+</code></pre>
+<p>結局 <code>int?</code> が必要になった. これでは台無しだ. しかも記述が面倒くさくてとてもやっていられない.</p>
+<p>しかし, 接続人数が得られるはそもそも処理に成功した場合だけなのだ. つまり, <code>ServerStatus.Idle</code> や <code>ServerStatus.Busy</code> 自体がクラスのように振る舞ってくれれば都合がいい.</p>
+<p>interface と型チェックでやってもいいが, これもまた面倒だ. そこで, enum にフィールドが直接書ければよいのでは？と考える.</p>
+<h2 id="enum">enum に値を持たせる</h2>
+<p>おことわり: ここから先は正しい C# ではない.</p>
+<pre><code class="language-csharp">enum ServerStatus
+{
+    Idle
+    {
+        int ConncetionsCount; 
+    },
+    Busy
+    {
+        int ConnectionsCount;
+    },
+    Error
+}
+
+void PrintStatus(ServerStatus s)
+{
+    switch(s)
+    {
+        case ServerStatus.Idle as i:
+            Console.WriteLine(&quot;Idle ({0} connections)&quot;, i.ConncetionsCount);
+            break;
+        case ServerStatus.Busy as b:
+            Console.WriteLine(&quot;Busy ({0} connections)&quot;, b.ConncetionsCount);
+            break;
+        case ServerStatus.Error:
+            Console.WriteLine(&quot;Error!&quot;);
+            break;
+    }
+}
+</code></pre>
+<p>というように書ければどうだろう. これなら「null 安全」である.</p>
+<p>このような「フィールドを持てるenum」は, 一般に「代数的データ型」や「ヴァリアント」と呼ばれているものと本質的には同じである.</p>
+<p>しかしまだ記述がめんどくさいようにも思える. 特に同じ意味の2つの <code>int ConnectionsCount</code> を一緒くたに扱えないのがよくない.</p>
+<h2 id="null-3">「null 安全」の正体</h2>
+<p>しかし, 勘のよい読者の皆様ならすでにお気づきのように, このようにすればよいのだ.</p>
+<pre><code class="language-csharp">enum Result&lt;T&gt;
+{
+    Success
+    {
+        T Value;
+    },
+    Failure
+}
+
+class ServerStatus
+{
+    public bool IsBusy;
+    public int ConnectionsCount;
+    public ServerStatus(bool _isBusy, int _count)
+    {
+        ...
+    }
+}
+
+public Result&lt;ServerStatus&gt; CheckServerStatus (Server s)
+{
+    try
+    {
+        var res = s.Access();
+        return Result.Success(new ServerStatus(res.IsBusy, res.Connections.Count));
+    }
+    catch
+    {
+        return Result.Failure;
+    }
+}
+</code></pre>
+<p>この <code>Result&lt;T&gt;</code> が肝だ. これは ML というプログラミング言語の系譜で古くから「Option」や「Maybe」として知られているものと全く同じ形をしている.</p>
+<pre><code class="language-ocaml">type 'a option = 
+    Some of 'a 
+  | None
+</code></pre>
+<p><code>'a</code> は <code>&lt;T&gt;</code> と同じで, C# におけるジェネリック型と同じものだ.</p>
+<p>また, OCaml では一つに対して一つのフィールドしか持つことができないので、名前はつけずに単に型名 <code>'a</code> だけを書く(ただし, OCaml には複数のフィールドを持つ型をかんたんに作れる仕組みがあるため, これは問題にはならない).</p>
+<p>もう一度上の <code>Result&lt;T&gt;</code> を載せておくので比べてみて欲しい.</p>
+<pre><code class="language-csharp">enum Result&lt;T&gt;
+{
+    Success
+    {
+        T Value;
+    },
+    Failure
+}
+</code></pre>
+<p>この <code>Result&lt;T&gt;</code> が, 今話題となっている「null 安全」の正体だ.</p>
+<h2 id="null-4">機能の拡張, あるいは「null 安全」の特長がいかにして実現されているか</h2>
+<p>つまり, 「null 安全」とは, 「フィールドを持てる enum」の特別な場合にすぎないということだ.</p>
+<p>しかし, 本当にこれだけで「null 安全」の主張する安全性・利便性をすべて備えているのだろうか？やってみよう.</p>
+<h3 id="section-2">「スマートキャスト」</h3>
+<p>これは, 「null チェックと non-null へのキャストをセットで行う仕組み」とのことだ.</p>
+<p>実際, これは値が返せる switch 式があれば問題ない.</p>
+<pre><code class="language-csharp">enum Result&lt;T&gt;
+{
+    Success
+    {
+        T Value;
+    },
+    Failure
+}
+
+var length =
+    switch(result)
+    {
+        case Result.Success as s:
+            return s.Value.Length;
+        case Result.Failure:
+            return 0;
+    }
+</code></pre>
+<p>このようなものは, ML 界隈では「パターンマッチ」として知られている.</p>
+<h3 id="section-3"><code>!</code>, <code>!!</code></h3>
+<p>「null である可能性を明示的に無視して nullable を non-null に変換する簡単な方法」, これは上のコードで <code>case Failure</code> の部分を書かない, もしくは単に例外を投げてしまうことに相当する.</p>
+<pre><code class="language-csharp">void ForceUnwrap&lt;T&gt;(this Result&lt;T&gt; res)
+{
+    switch(res)
+    {
+        case Result.Success as x:
+            return x.Value;
+        case Result.Failure:
+            throw new FailureException(&quot;given value is Failure&quot;);
+    }
+}
+
+var x = result.ForceUnwrap();
+</code></pre>
+<p>これは, OCaml における <code>Option.get</code> に相当する.</p>
+<p>しかし, 本来はこれは要らないかもしれない.</p>
+<p>そもそも, したい処理の内部から値を返す必要がないのなら, <code>Failure</code> の場合は単に処理を無視してくれればいい.</p>
+<pre><code class="language-csharp">
+void DoWhenSuccess&lt;T&gt;(this Result&lt;T&gt; res, Action&lt;T&gt; action)
+{
+    switch(res)
+    {
+        case Result.Success as x:
+            action(x.Value);
+            break;
+        case Result.Failure:
+            break;
+    }
+}
+
+result.DoWhenSuccess(x =&gt; 
+{
+    if(x &gt; 1000)
+        Console.WriteLine(&quot;x is bigger than 1000!&quot;);
+    else
+        Console.WriteLine(x);
+});
+
+</code></pre>
+<p>もしロジック上絶対 <code>Failure</code> が降ってこないことが分かっているなら, 単に以後の処理すべてを <code>DoWhenSuccess</code> 内でやってしまえばよいのだ.</p>
+<p>この <code>DoWhenSuccess</code> は, OCaml では <code>Option.may</code> という名前で知られている.</p>
+<blockquote>
+<p>C# では, ラムダ式 (クロージャ, ローカルな関数) は
+<code>引数 =&gt; 式</code> というように書く.
+式は, 波括弧を用いることで複文にすることもできる.</p>
+</blockquote>
+<h3 id="map"><code>?.</code>, <code>?-&gt;</code>, <code>map</code></h3>
+<p>これは単に <code>map</code> を定義してやればいいだろう.</p>
+<pre><code class="language-csharp">Result&lt;T2&gt; Map&lt;T1, T2&gt;(this Result&lt;T1&gt; res, Func&lt;T1, T2&gt; mapper)
+{
+    switch(res)
+    {
+        case Result.Success as x:
+            return Result.Success(mapper(x.Value));
+        case Result.Failure:
+            return Result.Failure;
+    }
+}
+
+var x2 = result.Map(x =&gt; x.StatusCode).Map(x =&gt; DoSomething(x));
+</code></pre>
+<p>OCaml での呼び名は <code>Option.map</code> である.</p>
+<h3 id="section-4"><code>?:</code>, <code>??</code></h3>
+<p>これも同様である.</p>
+<pre><code class="language-csharp">T OrDefault&lt;T&gt;(this Result&lt;T&gt; res, T defaultValue)
+{
+    switch(res)
+    {
+        case Result.Success as x:
+            return x.Value;
+        case Result.Failure:
+            return defaultValue;
+    }
+}
+
+var x2 = result.OrDefault(StaticData.ErrorPage);
+</code></pre>
+<p>OCaml では、先にデフォルト値を渡す形だが <code>Option.default</code> が同じものである.</p>
+<h3 id="flatmap-do"><code>flatMap</code>, <code>do</code></h3>
+<p>これはパターンマッチの表現能力の問題である.</p>
+<p>今までの <code>case Result.Success as x</code> 方式では, 入れ子になった構造 (<code>Result</code> の中に <code>Result</code> が入っているなど) を表現・分解することができない.</p>
+<p>ここで,</p>
+<pre><code class="language-csharp">enum Example
+{
+    Hoge
+    {
+       T1 Item1, T2 Item2, T3 Item3
+    },
+    Piyo
+    {
+       T4 Item1, T5 Item2
+    }
+}
+</code></pre>
+<p>というものがあるとき,</p>
+<pre><code class="language-csharp">switch(x)
+{
+    case Example.Hoge(x1, x2, x3):
+        // ...
+        break;
+    case Example.Hoge(y1, y2):
+        // ...
+        break;
+}
+</code></pre>
+<p>と書けば, <code>x1</code> に <code>Item1</code>, <code>x2</code> に <code>Item2</code> ... と代入されてケース内で使用できる, というようにする.</p>
+<p>この時, <code>case x in Result.Success(x)</code> と書けば, <code>T</code> 型の <code>x</code> がケース内で使えるようになる</p>
+<pre><code class="language-csharp">T OrDefault&lt;T&gt;(this Result&lt;T&gt; res, T defaultValue)
+{
+    switch(res)
+    {
+        case x in Result.Success(x):
+            return x;
+        case Result.Failure:
+            return defaultValue;
+    }
+}
+</code></pre>
+<p>また, 2つの値をひとまとめにできる <code>Tuple</code> (タプル, 2つ組) を導入する.</p>
+<p>そしてこの <code>Tuple</code> もパターンマッチでバラせるようにする.</p>
+<pre><code class="language-csharp">class Tuple&lt;T1, T2&gt;
+{
+    T1 Left, T2 Right
+}
+
+var sum =
+    switch(new Tuple(1, 2))
+    {
+        case (x1, x2) in Tuple(x1, x2):
+            return x1 + x2;
+        default:
+            return 0;
+    }
+</code></pre>
+<p>この時, <code>flatMap</code> や <code>do</code> は下のように書き表せる.</p>
+<pre><code class="language-csharp">// flatMap
+switch(result)
+{
+    case x in Result.Success(Result.Success(x)):
+        DoSomething(x);
+        break;
+    default:
+        break;
+}
+
+// do
+switch(new Tuple(res1, res2))
+{
+    case (x1, x2) in Tuple(Result.Success(x1), Result.Success(x2)):
+        DoSomething2(x1, x2);
+        break;
+    default:
+        break;
+}
+</code></pre>
+<p>ここで <code>default</code> は, すべての場合にマッチするものである.</p>
+<p>2つ目の例で, <code>Result</code> 2つからなる <code>Tuple</code> を作って, それに対してパターンマッチをかけているのがミソである.</p>
+<p><code>Tuple(Result.Success, Result.Failure)</code> のようなものはすべて <code>default</code> に流れることになり, 結果的に <code>res1</code> と <code>res2</code> が両方 <code>Success</code> でないと処理が実行されない, ということが実現されている.</p>
+<p>これらは, それぞれ OCaml では次のようである.</p>
+<pre><code class="language-ocaml">(* definition *)
+type 'a option = 
+    Some of 'a 
+  | None
+
+(* flatMap *)
+match result with
+| Some(Some x) -&gt; doSomething x
+| _ -&gt; ()
+
+(* do *)
+match (res1, res2) with
+| (Some x1, Some x2) -&gt; doSomething2 x1 x2
+| _ -&gt; ()
+</code></pre>
+<p>同じようなことが, OCaml ではいかに簡単にできるかがわかってもらえると思う.</p>
+<p>先ほど,</p>
+<blockquote>
+<p>OCaml には複数のフィールドを持つ型をかんたんに作れる仕組みがある</p>
+</blockquote>
+<p>と言ったのは, このように OCaml ではタプルをごく簡単に扱えることを指している.</p>
+<h3 id="section-5"><code>?</code></h3>
+<p>これは, <code>T</code> を <code>Result&lt;T&gt;</code> にするだけである.</p>
+<h2 id="null-5">主張:「null 安全」であることは本質的ではない</h2>
+<p>何が言いたいのかというと, 本当に必要なことは「複数の状態を持つ値を簡単に作れて, それを簡単に扱えること」であって, 決して「null を安全に扱える」ことではないのだ.</p>
+<p>つまり, null とかどうとか以前に, 静的型チェックに押し付けられるものはなるべく押し付けてしまったほうがいい, と言い換えることもできる.</p>
+<p>例えば, エラー情報も一緒に扱いたい場合は,</p>
+<pre><code class="language-csharp">enum TryResult&lt;T, E&gt;
+    where E : Exception // E は Exception の派生クラスに制限
+{
+    Success
+    {
+        T Value;
+    },
+    Failure
+    {
+        E InnerException;
+    }
+}
+</code></pre>
+<p>というようなものを書けば, 成功したら結果を, 失敗したら起こった例外を持つようなものを作ることができる.</p>
+<p>そして, そうやって作った複数の状態を持つ値を, 構造を用いて, 簡単に分解できるような仕組み (高機能なパターンマッチ) があればよいことも, 上で示したとおりである.</p>
+<p>こういうことを簡単に, そして当たり前にできる言語が OCaml や Haskell などの言語であって, null 安全を気に入ったあなたならば必ずそのような言語も気に入るはずだ.</p>
+
+    </section>
+    <hr />
+    <section>
+      <script src="https://utteranc.es/client.js"
+              repo="cannorin/cannorin.github.io"
+              branch="master"
+              issue-term="title"
+              async>
+      </script>
+    </section> 
+
+    <footer class="post-footer">
+      <section class="share">
+        <h4>Share</h4>
+        <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=null%20%E5%AE%89%E5%85%A8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E3%81%AE%E3%83%9D%E3%82%A8%E3%83%A0%20-%20SevenColoured"
+           onclick="window.open(this.href+' '+window.location.href, 'twitter-share', 'width=550,height=235');return false;">
+          <span class="hidden">Twitter</span>
+        </a>
+        <a href="https://mastoshare.net/post.php?text=null%20%E5%AE%89%E5%85%A8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E3%81%AE%E3%83%9D%E3%82%A8%E3%83%A0%20-%20SevenColoured" onclick="window.open(this.href+' '+window.location.href, '', 'width=500,height=400'); return false;"><img src="https://mastoshare.net/img/toot.svg" width="75" height="20"></a>
+      </section>
+    </footer>
+
+    &nbsp;
+  </article>
+</main>
+
+<aside class="read-next">
+  <a class="read-next-story" href="https://7colou.red/blog/2018/02-14-fsharp-typeclasses/index.html">
+    <section class="post">
+      <h2> F# で型クラス </h2>
+      <section class="post-excerpt">
+        F# の言語機能の隠された真の力をお伝えするために、とりあえずは Haskell の do-notation のようなものを実現してみせよう。
+      </section>
+    </section>
+  </a>
+</aside>
+
+  </div>
+
+  <footer class="site-footer clearfix">
+    <section class="copyright">
+      <p>
+        Articles are licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> (unless explicitly mentioned)
+      </p>
+      <p>
+        Code examples are licensed under the <a href="https://directory.fsf.org/wiki/License:Expat">Expat(MIT) license</a>.
+      </p>
+      <p style="text-align:left;margin-top:10px;"><img src="https://7colou.red/img/by-sa.png" alt="CC BY-SA 3.0"/></p>
+    </section>
+    <section class="poweredby">
+      <p>
+        This site is powered by <a href="https://github.com/cannorin/flxble">Flxble</a>,
+        and <a href="https://7colou.red/blog/2019/flxble.html">it's my own blog engine!</a>
+      </p>
+    </section>
+  </footer>
+
+  <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/jquery.fitvids.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/index.js"></script>
+
+</body>
+</html>
