@@ -12,7 +12,7 @@
 
 [Twitter::public](https://twitter.com/cannorin_pub) - tech stuff, announcement
 
-[Twitter::virtual](https://twitter.com/cannorin_vrc) - VRChat, DJing, music, gaming
+[Twitter::virtual](https://twitter.com/cannorin3) - DJing, music, gaming
 
 [Twitter::private](https://twitter.com/cannorin) - math, logic, IRL, s\*\*tposting
 
