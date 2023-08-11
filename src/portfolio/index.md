@@ -7,7 +7,7 @@
 
 DJ / Producer. [[bandcamp](https://cannorin.bandcamp.com/) / [soundcloud](https://soundcloud.com/cannorin) / [mixcloud](https://www.mixcloud.com/cannorin/)]
 
-Please contact me on Discord: `cannorin` (preferred) or Twitter: [@cannorin3](https://twitter.com/cannorin3).
+Please contact me on Discord: [cannorin](https://discord.com/users/497190979216867329) (preferred) or Twitter: [@cannorin3](https://twitter.com/cannorin3).
 
 
 <iframe width="100%" height="120" style="border: 0" src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&light=1&feed=%2Fcannorin%2Fcyberia-mix-20210925-ghostclub%2F"></iframe>
