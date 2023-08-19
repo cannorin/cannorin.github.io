@@ -56,7 +56,10 @@
            onclick="window.open(this.href+' '+window.location.href, 'twitter-share', 'width=550,height=235');return false;">
           <span class="hidden">Twitter</span>
         </a>
-        <a href="https://mastoshare.net/post.php?text={{title}}" onclick="window.open(this.href+' '+window.location.href, '', 'width=500,height=400'); return false;"><img src="https://mastoshare.net/img/toot.svg" width="75" height="20"></a>
+        <a href="https://mastoshare.net/post.php?text={{title}}"
+           onclick="window.open(this.href+' '+window.location.href, '', 'width=500,height=400'); return false;">
+          <img src="{{config.base_url}}/img/mastodon.svg" width="20" height="20">
+        </a>
         %% end
       </section>
     </footer>

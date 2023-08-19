@@ -2,7 +2,7 @@
   type = 'post'
   title = '「動的型つき」の言語を「型なし」と呼ぶのはおかしい，のか？'
   description = 'Twitter（現・X）でのこの種の定期イベントはそろそろやめにしないか'
-  post_date = 2023-08-19T16:00:00+09:00
+  post_date = 2023-08-19T16:15:00+09:00
   tags = ["type system", "type theory"]
 ---
 
