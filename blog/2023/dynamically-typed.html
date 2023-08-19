@@ -58,7 +58,8 @@
     </header>
 
     <section class="post-content">
-      <blockquote>
+      <p>ある日の Twitter （現・X）のタイムライン．</p>
+<blockquote>
 <p>動的型付けのことを型なしと呼ぶことに対しては様々な角度から殴ることが可能ですがどの角度から殴られたいですか？</p>
 </blockquote>
 <blockquote>
@@ -84,7 +85,7 @@
 <p>動的型付けは静的には型の整合性を検証しないけど、型自体は言語機能としても概念としてもきちんと持ってる</p>
 </blockquote>
 <p>派の主張であろう．そして，JavaScript を例にするが，静的型検査がないプログラム言語でも，型をチェックして安全に動くコードは書くことができる．</p>
-<pre><code class="language-js">// JavaScript
+<pre><code class="language-javascript">// JavaScript
 function greet(name) {
   if (typeof name !== &quot;string&quot;) throw new Error(&quot;name is not a string&quot;);
   return `Hello, ${name}!`;
@@ -96,13 +97,13 @@ function greet(name) {
 「動的」は一般に「実行時」という意味と思ってよいだろう．逆に「静的」は「実行せずに」という意味である．残った「型付け」という用語について考えてみる．</p>
 <p>「型」を「付け」ると言っているのだから，とりあえず <em>「型」なる何か</em> を <em>どこかに付ける</em> のであろう．ここで賢いあなたは「あれ？でもさっきの例だと，型って特に何もしなくても付いてたよ？」と思うかもしれない．その疑問は実は <strong>この問題の核心を突いている</strong> のだが，とりあえず置いておいてほしい．</p>
 <p>「型付け」における「型」は一旦謎のままとして，ここでいう「型」なるものを付けたり付けなかったりできる言語として TypeScript を考えよう．例えば，以下の TypeScript コードには「型がついてない」ことに，皆さん同意できることであろう．</p>
-<pre><code class="language-ts">// TypeScript
+<pre><code class="language-typescript">// TypeScript
 function greet(name) {
   return `Hello, ${name}!`;
 }
 </code></pre>
 <p>このコードに「型がついてない」ことに同意できない人も，わたしには救えないので，回れ右してほしい．型，ついてないですね？ TypeScript コンパイラくんも <code>Parameter 'name' implicitly has an 'any' type.</code> とか言って怒っている．よろしい．では，型を付けてみよう．</p>
-<pre><code class="language-ts">// TypeScript
+<pre><code class="language-typescript">// TypeScript
 function greet(name: string) {
   return `Hello, ${name}!`;
 }
@@ -119,7 +120,7 @@ function greet(name: string) {
 <p>Algorithms within this specification manipulate values each of which has an associated type. The possible value types are exactly those defined in this clause. Types are further subclassified into ECMAScript language types and specification types.</p>
 </blockquote>
 <p>JavaScript で扱うデータは最初から分類済，ということは，先ほど書いた以下の JavaScript コードでは，<strong>「分類できてないデータを改めて分類する」ような行為は一切していない</strong> のだ．</p>
-<pre><code class="language-js">// JavaScript
+<pre><code class="language-javascript">// JavaScript
 function greet(name) {
   if (typeof name !== &quot;string&quot;) throw new Error(&quot;name is not a string&quot;);
   return `Hello, ${name}!`;
@@ -130,7 +131,7 @@ JavaScript プログラムは <em>最初からデータに型が付いている�
 <p>つまり，<code>string</code> や <code>number</code> などの型があるから「型なし」という言葉を使うのはオカシイ，と主張するならば， <strong>型は最初からあるのだから「動的型付け」という言葉を使うのもオカシイ</strong>，と主張しなければならないのだ！</p>
 <h2 id="section-3">「型付け」は，型をどこに付けているのか？</h2>
 <p>ところで，TypeScript は JavaScript に静的な型システムを追加した言語である．つまり，全てのデータには最初から型が付いているし，<code>typeof</code> でそれをチェックすることもできる．実際，「<code>name</code> の型は <code>any</code> ですよ」と明示的に書くことで<a id="fnref:4" href="#fn:4" class="footnote-ref"><sup>4</sup></a>，先ほどの JavaScript コードと同様のものが TypeScript でも書ける．</p>
-<pre><code class="language-ts">// TypeScript
+<pre><code class="language-typescript">// TypeScript
 function greet2(name: any) {
   if (typeof name !== &quot;string&quot;) throw new Error(&quot;name is not a string&quot;);
   return `Hello, ${name}!`;
@@ -140,7 +141,7 @@ function greet2(name: any) {
 上のコードを <a href="https://www.typescriptlang.org/play?#code/GYVwdgxgLglg9mABAcwE4FN1QEwAowCGAtugFyIFgCeAlIgN4BQiiMwiuUVADunMPmLo6AQgC8YxACIAzlFQwwyKXSgALVHADuiMOh0BRVJtS4phEqxm64UCojkKlKgNzNEGKCFRIABgAl0ABsguAAaRAASegt0AF8RXzc4oA">TypeScript Playground</a> で書いたので，そこで確認してほしいのだが，<code>typeof name</code> の <code>name</code> の上にマウスを置くと <code>(parameter) name: any</code> と出るが，<code>return `Hello, ${name}!`</code> の <code>name</code> の上に置くと <code>(parameter) name: string</code> と出る．
 つまり上のコードでは，<code>name</code> が持っているデータの型を <code>typeof</code> で実行時にチェックするコードを書くことで，<code>name</code> が <code>if</code> 文より下では確かに <code>string</code> 型を持つことを，TypeScript コンパイラくんに教えてあげている（＝型付けを手伝っている）のだ．</p>
 <p>上の例から，TypeScript コンパイラはデータそのものの型を気にしているというよりかは，それが入っている変数 <code>name</code> の型を気にしているのが分かると思う．データが手元にあればそのデータの型は分かって当たり前だが，ある変数にどのような型のデータが入ってくるかを <em>実行せず</em> に調べるのは，簡単にできることではなさそうだ．それを行うのが「型付け」だ． <strong>「型付け」の対象はデータそのものではなく，定数や変数のような，データに直接対応するプログラムの構文である．</strong> 「データに直接対応する構文」って定数や変数以外何があんねんと思う方は，</p>
-<pre><code class="language-ts">// TypeScript
+<pre><code class="language-typescript">// TypeScript
 
 function greet(name: string) {
   return `Hello, ${name}!`;
@@ -207,18 +208,17 @@ console.log(greet(greet(&quot;World&quot;))); // Hello, Hello, World!
 <h2 id="section-5">おまけ: 「静的型付け」は実は「データの分類」以上の行為である</h2>
 <p>みなさん，中立的になりましたね？ では，以後は JavaScript 的な型付け（してないけど）のことを「動的型付け」，逆に TypeScript 的な型付けのことを「静的型付け」と呼ぶことにする．</p>
 <p>ところで，TypeScript を書いたことがあるかたはご存じかと思うが，TypeScript ではクラスに対してクラス型というものがつく．</p>
-<pre><code class="language-ts">// TypeScript
+<pre><code class="language-typescript">// TypeScript
 class Point {
   x: number;
   y: number;
-
   constructor(x: number, y: number) {
     this.x = x; this.y = y;
   }
 } 
 </code></pre>
 <p>このように <code>Point</code> というクラスを定義すると，<code>Point</code> という名前の型が作られ，<code>Point</code> クラスのインスタンスは <code>Point</code> 型を持つことになる．</p>
-<pre><code class="language-ts">// TypeScript
+<pre><code class="language-typescript">// TypeScript
 
 function distance(p1: Point, p2: Point): number {
   return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
@@ -228,11 +228,10 @@ console.log(distance(new Point(1,1), new Point(2, 0)));
 </code></pre>
 <p>このように，<code>Point</code> クラスのインスタンスを2つ受け取って，点間の距離を返す関数 <code>distance</code> は，<code>Point</code> 型の引数を2つ取って，点間の距離を <code>number</code> で返す，という型を持つことになる．「変数 <code>p1, p2</code> が <code>Point</code> クラスのインスタンスである」ことと，「変数 <code>p1, p2</code> が <code>Point</code> 型を持つ」ということを同一視している，ということがわかるだろうか．</p>
 <p>また，何か別のクラス，例えば <code>Person</code> があったとして，<code>Person</code> クラスのインスタンスを <code>distance</code> に渡そうとしても TypeScript コンパイラ君が許さない．</p>
-<pre><code class="language-ts">// TypeScript
+<pre><code class="language-typescript">// TypeScript
 
 class Person {
   name: string;
-
   constructor(name: string) {
     this.name = name;
   }
@@ -263,25 +262,25 @@ console.log(distance(new Point(0, 0), new Person(&quot;Alice&quot;)));
 </li>
 </ul>
 <p>実際，JavaScript において <code>Point</code> クラスと <code>Person</code> クラスのインスタンスをそれぞれ作って，<code>typeof</code> をしてみると，両方とも <code>object</code> を返す．</p>
-<pre><code class="language-js">// JavaScript
+<pre><code class="language-javascript">// JavaScript
 
 class Point {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
 }
 console.log(typeof (new Point(0, 0))); // &quot;object&quot;
 
 class Person {
-    constructor(name) {
-        this.name = name;
-    }
+  constructor(name) {
+    this.name = name;
+  }
 }
 console.log(typeof (new Person(&quot;Alice&quot;))); // &quot;object&quot;
 </code></pre>
 <p>つまり，<strong>JavaScript の動的型付けでは，クラスのインスタンスは（違うクラスであっても）全て <code>object</code> 型を持つ</strong> ことがわかる．では JavaScript ではこの種の区別をどうやっているのかというと，それぞれのオブジェクトが「どのクラスのコンストラクタから作られたのか」を表す <strong>プロトタイプ（チェーン）</strong> というものを持っている．<code>instanceof</code> という演算子を使うことで，オブジェクトが実際にあるクラスのインスタンスなのかどうかを，オブジェクトのプロトタイプを見てチェックすることができる．</p>
-<pre><code class="language-js">// JavaScript
+<pre><code class="language-javascript">// JavaScript
 function distance(p1, p2) {
   if (!(p1 instanceof Point)) throw new Error(&quot;p1 is not a point.&quot;);
   if (!(p2 instanceof Point)) throw new Error(&quot;p2 is not a point.&quot;);
@@ -306,14 +305,14 @@ TypeScript を例に取ると，</p>
 </ul>
 <p>しかし，クラス型が保証する「インスタンスである」という条件も，結局「データの持つ属性」と言えなくもないのでは？と思う諸氏もいることだろう．では，ある変数 <code>baz</code> が持つ型が，<code>baz</code> 自身に入るデータの属性とは <em>もはや何の関係もない条件を保証する</em> 例を挙げれば，「不変条件全般を扱える」ということに納得していただけるだろうか？</p>
 <p>ここで，TypeScript で <code>typeof</code> を使う例を思い出してほしい．</p>
-<pre><code class="language-ts">// TypeScript
+<pre><code class="language-typescript">// TypeScript
 function greet2(name: any) {
   if (typeof name !== &quot;string&quot;) throw new Error(&quot;name is not a string&quot;);
   return `Hello, ${name}!`;
 }
 </code></pre>
 <p>この例において，<code>`Hello, ${name}!`</code> の <code>name</code> の上にマウスカーソルを置くと <code>(parameter) name: string</code> と出てくるのは一体何故なのだろうか？ 実は，<code>if (typeof name !== &quot;string&quot;) throw ...</code> という文が，<code>if</code> 以下において <code>name</code> の型が <code>string</code> であることを保証しているのだ．これは，一旦別の関数に分割するとわかりやすい．</p>
-<pre><code class="language-ts">// TypeScript
+<pre><code class="language-typescript">// TypeScript
 
 function isString(name: any): name is string {
   return typeof name === &quot;string&quot;;
@@ -321,13 +320,12 @@ function isString(name: any): name is string {
 
 function greet2(name: any) {
   const nameIsString = isString(name);
-
   if (nameIsString) return `Hello, ${name}!`;
   else throw new Error(&quot;name is not a string&quot;);
 }
 </code></pre>
 <p>上の例も <a href="https://www.typescriptlang.org/play?#code/GYVwdgxgLglg9mABDAzgZSgJxmA5gCgA8AuRAQzAE8BKUw5FRFLHXRAbwChFFMBTKCExIolAA584wRPQC88xACJm2PIoDcnAL6dOoSLASJc-AQCZ8YMgFs+pCjQ7dEEBM0RXbASXQs8iWQYMVQJPPmpNZxhpSxs+H2DWal4BISQAAwAJPgAbHLgAGkQAEnYwrQBCdM0eXJQ+RCgAC0w4AHcPPg6AUUxWzHxFMIYPOChyJj9cRQjtIA">TypeScript Playground</a> を用意してある．ここでも，<code>`Hello, ${name}!`</code> の <code>name</code> の上にマウスカーソルを置くと <code>(parameter) name: string</code> と出てくるのが確認できるだろう．何故こんなことができるのか？ それは，<code>isString</code> 関数の戻り値の型が <code>name is string</code> という珍妙な型を持っているからである．この型は文字通り，「<code>name</code> という変数が <code>string</code> 型を持っているかどうか」を表すもので，取りうる値は <code>true</code> もしくは <code>false</code> である．つまり，上の例では</p>
-<pre><code class="language-ts">const nameIsString = isString(name);
+<pre><code class="language-typescript">const nameIsString = isString(name);
 </code></pre>
 <p>と結果を変数 <code>nameIsString</code> に代入しているが，ここで <code>isString</code> 関数の戻り値の型が <code>name is string</code> であることは，<strong>「もし <code>nameIsString</code> が <code>true</code> ならば，<code>name</code> の型は <code>string</code> である」</strong> ことを保証しているのだ！ これが保証されているからこそ，<code>if (nameIsString)</code> の中にある（＝ <code>nameIsString</code> が <code>true</code> であるケースの） <code>`Hello, ${name}!`</code> においては，<code>name</code> の型は <code>string</code> になっているのである．そして，<code>name is string</code> 型が保証している条件は <code>name</code> の型についてであって，<code>nameIsString</code> のデータの種類などは <em>もはやどうでもよくなっている</em> ことに注意してほしい．</p>
 <p>以上の内容をまとめよう．</p>
@@ -363,7 +361,7 @@ function greet2(name: any) {
 </blockquote>
 <p>や，</p>
 <blockquote>
-<pre><code class="language-ts">// TypeScript
+<pre><code class="language-typescript">// TypeScript
 function greet(name) {
   return `Hello, ${name}!`;
 }
@@ -375,12 +373,12 @@ function greet(name) {
 ガチガチの静的型付け原理主義者で救いようがない，ということです……</p>
 <h2 id="section-6">おまけのおまけ: 「型推論」と「動的型付け」の混同について</h2>
 <p>以上の話がきちんと分かっていれば，TypeScript で</p>
-<pre><code class="language-ts">// TypeScript
+<pre><code class="language-typescript">// TypeScript
 const x = &quot;foo&quot;;
 </code></pre>
 <p>と書くと <code>x</code> の型が <code>string</code> になるといった，いわゆる「型推論」と，
 JavaScript で</p>
-<pre><code class="language-js">// JavaScript
+<pre><code class="language-javascript">// JavaScript
 const x = &quot;foo&quot;;
 </code></pre>
 <p>と型を指定せずに書ける，いわゆる「動的型付け」（という呼び方はオカシイと散々言ってるが）を，混同する <strong>わけがない</strong> のである．TypeScript コンパイラくんは型推論を頑張ったので，変数 <code>x</code> の型が <code>string</code> であることをキチンと知っているし，それこそが彼にとって大事なことだ．一方 JavaScript プログラムくん的には， <code>&quot;foo&quot;</code> というデータは生まれた時から <code>string</code> なのであって，それが入ってる変数 <code>x</code> の型なんてものは知ったことではないのである．</p>
