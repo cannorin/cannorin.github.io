@@ -6,6 +6,8 @@
   tags = ["type system", "type theory"]
 ---
 
+ある日の Twitter （現・X）のタイムライン．
+
 > 動的型付けのことを型なしと呼ぶことに対しては様々な角度から殴ることが可能ですがどの角度から殴られたいですか？
 
 > 定期的に出現する「動的型つきの言語を『型なしの言語』と呼ぶのはおかしい」論がなぜか軒並みかなり自信を持ったような書きぶりなのが不思議（TaPLの1章だけでも読めばもっと整理された理解になると思うんですけど）
@@ -34,7 +36,7 @@
 
 派の主張であろう．そして，JavaScript を例にするが，静的型検査がないプログラム言語でも，型をチェックして安全に動くコードは書くことができる．
 
-```js
+```javascript
 // JavaScript
 function greet(name) {
   if (typeof name !== "string") throw new Error("name is not a string");
@@ -53,7 +55,7 @@ function greet(name) {
 
 「型付け」における「型」は一旦謎のままとして，ここでいう「型」なるものを付けたり付けなかったりできる言語として TypeScript を考えよう．例えば，以下の TypeScript コードには「型がついてない」ことに，皆さん同意できることであろう．
 
-```ts
+```typescript
 // TypeScript
 function greet(name) {
   return `Hello, ${name}!`;
@@ -62,7 +64,7 @@ function greet(name) {
 
 このコードに「型がついてない」ことに同意できない人も，わたしには救えないので，回れ右してほしい．型，ついてないですね？ TypeScript コンパイラくんも `Parameter 'name' implicitly has an 'any' type.` とか言って怒っている．よろしい．では，型を付けてみよう．
 
-```ts
+```typescript
 // TypeScript
 function greet(name: string) {
   return `Hello, ${name}!`;
@@ -86,7 +88,7 @@ function greet(name: string) {
 
 JavaScript で扱うデータは最初から分類済，ということは，先ほど書いた以下の JavaScript コードでは，**「分類できてないデータを改めて分類する」ような行為は一切していない** のだ．
 
-```js
+```javascript
 // JavaScript
 function greet(name) {
   if (typeof name !== "string") throw new Error("name is not a string");
@@ -107,7 +109,7 @@ JavaScript プログラムは *最初からデータに型が付いている世�
 
 [^4]: 実は先ほどの例では，TypeScript コンパイラくんは「型注釈を（`: any` すらも）**明示的に書いていないこと**」に怒っている．嘘ついてごめん…… また，明示的に `any` を書く行為も ESLint で禁止できる
 
-```ts
+```typescript
 // TypeScript
 function greet2(name: any) {
   if (typeof name !== "string") throw new Error("name is not a string");
@@ -121,7 +123,7 @@ function greet2(name: any) {
 
 上の例から，TypeScript コンパイラはデータそのものの型を気にしているというよりかは，それが入っている変数 `name` の型を気にしているのが分かると思う．データが手元にあればそのデータの型は分かって当たり前だが，ある変数にどのような型のデータが入ってくるかを *実行せず* に調べるのは，簡単にできることではなさそうだ．それを行うのが「型付け」だ． **「型付け」の対象はデータそのものではなく，定数や変数のような，データに直接対応するプログラムの構文である．** 「データに直接対応する構文」って定数や変数以外何があんねんと思う方は，
 
-```ts
+```typescript
 // TypeScript
 
 function greet(name: string) {
@@ -193,12 +195,11 @@ console.log(greet(greet("World"))); // Hello, Hello, World!
 
 ところで，TypeScript を書いたことがあるかたはご存じかと思うが，TypeScript ではクラスに対してクラス型というものがつく．
 
-```ts
+```typescript
 // TypeScript
 class Point {
   x: number;
   y: number;
-
   constructor(x: number, y: number) {
     this.x = x; this.y = y;
   }
@@ -207,7 +208,7 @@ class Point {
 
 このように `Point` というクラスを定義すると，`Point` という名前の型が作られ，`Point` クラスのインスタンスは `Point` 型を持つことになる．
 
-```ts
+```typescript
 // TypeScript
 
 function distance(p1: Point, p2: Point): number {
@@ -221,12 +222,11 @@ console.log(distance(new Point(1,1), new Point(2, 0)));
 
 また，何か別のクラス，例えば `Person` があったとして，`Person` クラスのインスタンスを `distance` に渡そうとしても TypeScript コンパイラ君が許さない．
 
-```ts
+```typescript
 // TypeScript
 
 class Person {
   name: string;
-
   constructor(name: string) {
     this.name = name;
   }
@@ -254,28 +254,28 @@ console.log(distance(new Point(0, 0), new Person("Alice")));
 
 実際，JavaScript において `Point` クラスと `Person` クラスのインスタンスをそれぞれ作って，`typeof` をしてみると，両方とも `object` を返す．
 
-```js
+```javascript
 // JavaScript
 
 class Point {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
 }
 console.log(typeof (new Point(0, 0))); // "object"
 
 class Person {
-    constructor(name) {
-        this.name = name;
-    }
+  constructor(name) {
+    this.name = name;
+  }
 }
 console.log(typeof (new Person("Alice"))); // "object"
 ```
 
 つまり，**JavaScript の動的型付けでは，クラスのインスタンスは（違うクラスであっても）全て `object` 型を持つ** ことがわかる．では JavaScript ではこの種の区別をどうやっているのかというと，それぞれのオブジェクトが「どのクラスのコンストラクタから作られたのか」を表す **プロトタイプ（チェーン）** というものを持っている．`instanceof` という演算子を使うことで，オブジェクトが実際にあるクラスのインスタンスなのかどうかを，オブジェクトのプロトタイプを見てチェックすることができる．
 
-```js
+```javascript
 // JavaScript
 function distance(p1, p2) {
   if (!(p1 instanceof Point)) throw new Error("p1 is not a point.");
@@ -298,7 +298,7 @@ TypeScript を例に取ると，
 
 ここで，TypeScript で `typeof` を使う例を思い出してほしい．
 
-```ts
+```typescript
 // TypeScript
 function greet2(name: any) {
   if (typeof name !== "string") throw new Error("name is not a string");
@@ -308,7 +308,7 @@ function greet2(name: any) {
 
 この例において，``` `Hello, ${name}!` ``` の `name` の上にマウスカーソルを置くと `(parameter) name: string` と出てくるのは一体何故なのだろうか？ 実は，`if (typeof name !== "string") throw ...` という文が，`if` 以下において `name` の型が `string` であることを保証しているのだ．これは，一旦別の関数に分割するとわかりやすい．
 
-```ts
+```typescript
 // TypeScript
 
 function isString(name: any): name is string {
@@ -317,7 +317,6 @@ function isString(name: any): name is string {
 
 function greet2(name: any) {
   const nameIsString = isString(name);
-
   if (nameIsString) return `Hello, ${name}!`;
   else throw new Error("name is not a string");
 }
@@ -325,7 +324,7 @@ function greet2(name: any) {
 
 上の例も [TypeScript Playground](https://www.typescriptlang.org/play?#code/GYVwdgxgLglg9mABDAzgZSgJxmA5gCgA8AuRAQzAE8BKUw5FRFLHXRAbwChFFMBTKCExIolAA584wRPQC88xACJm2PIoDcnAL6dOoSLASJc-AQCZ8YMgFs+pCjQ7dEEBM0RXbASXQs8iWQYMVQJPPmpNZxhpSxs+H2DWal4BISQAAwAJPgAbHLgAGkQAEnYwrQBCdM0eXJQ+RCgAC0w4AHcPPg6AUUxWzHxFMIYPOChyJj9cRQjtIA) を用意してある．ここでも，``` `Hello, ${name}!` ``` の `name` の上にマウスカーソルを置くと `(parameter) name: string` と出てくるのが確認できるだろう．何故こんなことができるのか？ それは，`isString` 関数の戻り値の型が `name is string` という珍妙な型を持っているからである．この型は文字通り，「`name` という変数が `string` 型を持っているかどうか」を表すもので，取りうる値は `true` もしくは `false` である．つまり，上の例では
 
-```ts
+```typescript
 const nameIsString = isString(name);
 ```
 
@@ -351,7 +350,7 @@ const nameIsString = isString(name);
 
 や，
 
-> ```ts
+> ```typescript
 > // TypeScript
 > function greet(name) {
 >   return `Hello, ${name}!`;
@@ -368,7 +367,7 @@ const nameIsString = isString(name);
 
 以上の話がきちんと分かっていれば，TypeScript で
 
-```ts
+```typescript
 // TypeScript
 const x = "foo";
 ```
@@ -376,7 +375,7 @@ const x = "foo";
 と書くと `x` の型が `string` になるといった，いわゆる「型推論」と，
 JavaScript で
 
-```js
+```javascript
 // JavaScript
 const x = "foo";
 ```
