@@ -1,0 +1,479 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <title>
+    「動的型つき」の言語を「型なし」と呼ぶのはおかしい，のか？ - SevenColoured
+  </title>
+  <meta name="description" content="Twitter（現・X）でのこの種の定期イベントはそろそろやめにしないか" />
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="alternate" href="https://7colou.red/rss.xml" title="SevenColoured" type="application/rss+xml">
+  <link rel="shortcut icon" href="https://7colou.red/favicon.png">
+
+  <link rel="stylesheet" type="text/css" href="https://7colou.red/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <link rel="stylesheet" href="https://7colou.red/highlight/styles/default.css">
+  <script src="https://7colou.red/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body class="post-template">
+  <header class="default-header">
+    <nav class="main-nav clearfix">
+      <a class="nav-item" href="https://7colou.red/index.html">Home</a>
+      <a class="nav-item" href="https://7colou.red/portfolio/index.html">Portfolio</a>
+      <a class="nav-item" href="https://7colou.red/blog/index.html">Blog</a>
+    </nav>
+  </header>
+  
+<span class="nav-cover"></span>
+
+  <div class="site-wrapper">
+    
+<main class="content" role="main">
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">「動的型つき」の言語を「型なし」と呼ぶのはおかしい，のか？</h1>
+      <section class="post-meta">
+        <time class="post-date" datetime="2023-08-19T16:00:00.0000000">
+            <a href="https://7colou.red/blog/archive/2023-8.html">
+              2023年8月19日土曜日 16:00:00
+            </a>
+        </time>
+        <span class="tags">
+          <strong>Tags: </strong>
+              <a href="https://7colou.red/blog/tag/type%20system">type system</a>
+              <a href="https://7colou.red/blog/tag/type%20theory">type theory</a>
+        </span>
+      </section>
+    </header>
+
+    <section class="post-content">
+      <blockquote>
+<p>動的型付けのことを型なしと呼ぶことに対しては様々な角度から殴ることが可能ですがどの角度から殴られたいですか？</p>
+</blockquote>
+<blockquote>
+<p>定期的に出現する「動的型つきの言語を『型なしの言語』と呼ぶのはおかしい」論がなぜか軒並みかなり自信を持ったような書きぶりなのが不思議（TaPLの1章だけでも読めばもっと整理された理解になると思うんですけど）</p>
+</blockquote>
+<blockquote>
+<p>型なしのことを動的型付けと呼ぶの、安全ではない言語が幅を利かせていた頃の名残だと思ってる（偏見）</p>
+</blockquote>
+<blockquote>
+<p>動的型付けは静的には型の整合性を検証しないけど、型自体は言語機能としても概念としてもきちんと持ってるわけで、それを「自分が所望する安全性を提供しないから」って理由で「型など存在しない」まで言い切るのは流石に暴論というかただのディスりに片足突っ込んでね、と。</p>
+</blockquote>
+<p>お前ら，いい加減にせい！！！！！！！！！！ 何回目だよ<a id="fnref:1" href="#fn:1" class="footnote-ref"><sup>1</sup></a>！！！！！！！！！！</p>
+<h2 id="section">「型」とは何であるか</h2>
+<p>まず「型」という用語の定義についてハッキリさせておこう．おそらく全員に同意してもらえるであろう定義を提示する．</p>
+<blockquote>
+<p>「型」とは，プログラム内で扱うデータを分類するものである</p>
+</blockquote>
+<p>これに同意できないひとは，申し訳ないが回れ右してほしい．わたしには君を救うことはできない……</p>
+<p>さて，実用的なプログラム言語であれば必ず <code>number</code> や <code>string</code> といった「プリミティヴ・データ型」なるものを持っているはずだ．
+ここで JavaScript のような静的型検査をしないプログラム言語を考えてみると，変数 <code>foo</code> にデータが格納されているとして，<code>typeof foo</code> とかやると
+<code>number</code> やら <code>string</code> やらが帰ってくる．プログラム中で扱うデータが分類できている．つまり，JavaScript に型はある！というのが，</p>
+<blockquote>
+<p>動的型付けは静的には型の整合性を検証しないけど、型自体は言語機能としても概念としてもきちんと持ってる</p>
+</blockquote>
+<p>派の主張であろう．そして，JavaScript を例にするが，静的型検査がないプログラム言語でも，型をチェックして安全に動くコードは書くことができる．</p>
+<pre><code class="language-js">// JavaScript
+function greet(name) {
+  if (typeof name !== &quot;string&quot;) throw new Error(&quot;name is not a string&quot;);
+  return `Hello, ${name}!`;
+}
+</code></pre>
+<p>この状況を「型なし」と言ってしまうのは，確かにオカシイ気がする．</p>
+<h2 id="section-1">「型付け」とは何であるか</h2>
+<p>一方，両派がともに問題にしているのは「動的型付け」という用語の使い方だ．ここで，「動的型付け」とは「動的」に「型付け」をすることであろう．
+「動的」は一般に「実行時」という意味と思ってよいだろう．逆に「静的」は「実行せずに」という意味である．残った「型付け」という用語について考えてみる．</p>
+<p>「型」を「付け」ると言っているのだから，とりあえず <em>「型」なる何か</em> を <em>どこかに付ける</em> のであろう．ここで賢いあなたは「あれ？でもさっきの例だと，型って特に何もしなくても付いてたよ？」と思うかもしれない．その疑問は実は <strong>この問題の核心を突いている</strong> のだが，とりあえず置いておいてほしい．</p>
+<p>「型付け」における「型」は一旦謎のままとして，ここでいう「型」なるものを付けたり付けなかったりできる言語として TypeScript を考えよう．例えば，以下の TypeScript コードには「型がついてない」ことに，皆さん同意できることであろう．</p>
+<pre><code class="language-ts">// TypeScript
+function greet(name) {
+  return `Hello, ${name}!`;
+}
+</code></pre>
+<p>このコードに「型がついてない」ことに同意できない人も，わたしには救えないので，回れ右してほしい．型，ついてないですね？ TypeScript コンパイラくんも <code>Parameter 'name' implicitly has an 'any' type.</code> とか言って怒っている．よろしい．では，型を付けてみよう．</p>
+<pre><code class="language-ts">// TypeScript
+function greet(name: string) {
+  return `Hello, ${name}!`;
+}
+</code></pre>
+<p>型，付けれましたね？ うむうむ，<code>: string</code> というものを <em>付けた</em> という確かな実感がある．これには TypeScript コンパイラくんも大満足．で，彼は何に怒っていたのだろう？彼は <code>Parameter 'name' implicitly has an 'any' type.</code> と言っていた．TypeScript において「<code>any</code> 型である」というのは「どんな種類のデータでもある可能性がある」という意味だ．つまり，これは「<code>name</code> にはどんなデータでも入ってくる可能性があるよ」，言い換えれば「<code>name</code> に入るのがどんな種類のデータなのかわからないよ」と言っている．そして我々が <code>: string</code> と付けたことによって，「<code>name</code> には <code>string</code> 型のデータしか入ってこない」と知ったので，彼は怒らなくなったのである．まとめると，以下の通りである．</p>
+<blockquote>
+<p>「型付け」とは，データが分類できてない状況下で，何らかの手段<a id="fnref:2" href="#fn:2" class="footnote-ref"><sup>2</sup></a>で，分類できている状態にすることである</p>
+</blockquote>
+<p>以上の定義も，まぁ全員に同意してもらえることだと思う．</p>
+<h2 id="section-2">「動的型付け」という言い回しは，「型なし」と同じ理由でオカシイ！</h2>
+<p>ここで問題となってくるのが，「あれ？でもさっきの例だと，型って特に何もしなくても付いてたよ？」という疑問である．<code>string</code> とか <code>number</code> とかって，<em>TypeScript コンパイラくんが知らないだけ</em> で，何もしなくても最初から決まっていなかったっけ？
+実際，JavaScript の標準規格である <a href="https://262.ecma-international.org/14.0/">ECMAScript</a> では，プログラム中で扱うデータは， <code>string</code> なり <code>number</code> なりに，最初から分類済である，ということになっている．</p>
+<blockquote>
+<p>Algorithms within this specification manipulate values each of which has an associated type. The possible value types are exactly those defined in this clause. Types are further subclassified into ECMAScript language types and specification types.</p>
+</blockquote>
+<p>JavaScript で扱うデータは最初から分類済，ということは，先ほど書いた以下の JavaScript コードでは，<strong>「分類できてないデータを改めて分類する」ような行為は一切していない</strong> のだ．</p>
+<pre><code class="language-js">// JavaScript
+function greet(name) {
+  if (typeof name !== &quot;string&quot;) throw new Error(&quot;name is not a string&quot;);
+  return `Hello, ${name}!`;
+}
+</code></pre>
+<p>ここでやっているのは，プログラムが預かり知らぬところで<a id="fnref:3" href="#fn:3" class="footnote-ref"><sup>3</sup></a> <em>最初から分類済である</em> ところの「型」を「チェック」しているのであって，「型付け」ではなく「型チェック」なのだ！
+JavaScript プログラムは <em>最初からデータに型が付いている世界に生きている</em> のであって，これを「動的型付け」などと，あたかも型を <em>元々は付いてなくて，実行時になってから付けたかのように</em> 呼ぶのはおかしくないだろうか？</p>
+<p>つまり，<code>string</code> や <code>number</code> などの型があるから「型なし」という言葉を使うのはオカシイ，と主張するならば， <strong>型は最初からあるのだから「動的型付け」という言葉を使うのもオカシイ</strong>，と主張しなければならないのだ！</p>
+<h2 id="section-3">「型付け」は，型をどこに付けているのか？</h2>
+<p>ところで，TypeScript は JavaScript に静的な型システムを追加した言語である．つまり，全てのデータには最初から型が付いているし，<code>typeof</code> でそれをチェックすることもできる．実際，「<code>name</code> の型は <code>any</code> ですよ」と明示的に書くことで<a id="fnref:4" href="#fn:4" class="footnote-ref"><sup>4</sup></a>，先ほどの JavaScript コードと同様のものが TypeScript でも書ける．</p>
+<pre><code class="language-ts">// TypeScript
+function greet2(name: any) {
+  if (typeof name !== &quot;string&quot;) throw new Error(&quot;name is not a string&quot;);
+  return `Hello, ${name}!`;
+}
+</code></pre>
+<p>一見 JavaScript と同じことをしているように見えるが，実は TypeScript はこの状況でも「型付け」を行う．
+上のコードを <a href="https://www.typescriptlang.org/play?#code/GYVwdgxgLglg9mABAcwE4FN1QEwAowCGAtugFyIFgCeAlIgN4BQiiMwiuUVADunMPmLo6AQgC8YxACIAzlFQwwyKXSgALVHADuiMOh0BRVJtS4phEqxm64UCojkKlKgNzNEGKCFRIABgAl0ABsguAAaRAASegt0AF8RXzc4oA">TypeScript Playground</a> で書いたので，そこで確認してほしいのだが，<code>typeof name</code> の <code>name</code> の上にマウスを置くと <code>(parameter) name: any</code> と出るが，<code>return `Hello, ${name}!`</code> の <code>name</code> の上に置くと <code>(parameter) name: string</code> と出る．
+つまり上のコードでは，<code>name</code> が持っているデータの型を <code>typeof</code> で実行時にチェックするコードを書くことで，<code>name</code> が <code>if</code> 文より下では確かに <code>string</code> 型を持つことを，TypeScript コンパイラくんに教えてあげている（＝型付けを手伝っている）のだ．</p>
+<p>上の例から，TypeScript コンパイラはデータそのものの型を気にしているというよりかは，それが入っている変数 <code>name</code> の型を気にしているのが分かると思う．データが手元にあればそのデータの型は分かって当たり前だが，ある変数にどのような型のデータが入ってくるかを <em>実行せず</em> に調べるのは，簡単にできることではなさそうだ．それを行うのが「型付け」だ． <strong>「型付け」の対象はデータそのものではなく，定数や変数のような，データに直接対応するプログラムの構文である．</strong> 「データに直接対応する構文」って定数や変数以外何があんねんと思う方は，</p>
+<pre><code class="language-ts">// TypeScript
+
+function greet(name: string) {
+  return `Hello, ${name}!`;
+}
+
+console.log(greet(greet(&quot;World&quot;))); // Hello, Hello, World!
+</code></pre>
+<p>というコードを考えてほしい．ここで，<code>&quot;World&quot;</code> という定数が <code>string</code> 型を持っているから <code>greet</code> の引数として渡せるのと同様に，<code>greet(&quot;World&quot;)</code> という <strong>式</strong> も <code>string</code> 型を持っている<a id="fnref:5" href="#fn:5" class="footnote-ref"><sup>5</sup></a>ので，再び <code>greet</code> の引数として渡すことができるのだ．</p>
+<p>この意味でも，<strong>JavaScript は TypeScript 的な「型付け」なる行為を断じて行っていない</strong> ことが分かると思う．JavaScript が扱っている「型」はあくまでデータが持つ属性であって，データが入っている変数や，データを生成する式などは，型の概念と一切関係がない．変数にどういう型のデータが入ってくるか，なんて知ったことではないのだ．</p>
+<p>また，上記の <code>typeof</code> を使った TypeScript コードのように，「データの型を <em>動的</em> にチェックすることで，構文に型付けをする」ことを「 <em>動的</em> 型付け」と呼んでいる，そして JavaScript をそのまま TypeScript として読んだときのように．「データの型の <em>動的</em> チェックしか，構文への型付けの手段がない」言語を「 <em>動的</em> 型つき言語」と呼んでいる人々もいるかもしれないが，この場合においても，実際の型付けは TypeScript コンパイラが <em>静的に</em> 行っているわけで，<strong>紛らわしいからやめたほうがいい</strong>，とわたしは思う．</p>
+<blockquote>
+<p>「動的型付けされる」といった言い回しは誤っているといって差し支えなく、おそらく「動的検査される」と言い換えるべきである</p>
+</blockquote>
+<p>って TaPL も言っている<a id="fnref:6" href="#fn:6" class="footnote-ref"><sup>6</sup></a>ことだし．</p>
+<h2 id="section-4">おまえはポジショントークをしているぞ</h2>
+<p>まとめよう．</p>
+<ul>
+<li><p>JavaScript プログラムくんの立場では，</p>
+<ul>
+<li>データは最初から分類済である．つまり <strong>全ては最初から「型が付いている＝型付き」</strong> なのであって，断じて「型なし」ではなく，実行時に（＝動的に）改めて &quot;型を付ける&quot; などということもしない．</li>
+<li>変数はただのデータの入れ物であって，型とかは関係がない．</li>
+<li>データに型を付けるのは JavaScript 処理系の内部実装が勝手にやってることであって，JavaScript プログラム的には知ったことではない．</li>
+<li><code>typeof</code> を使うと，データに（最初から）付いている型をプログラム内でチェックすることができる（＝「型チェック」）．</li>
+</ul>
+</li>
+<li><p>TypeScript コンパイラくんの立場では，</p>
+<ul>
+<li>型注釈を書いたり，型推論したりすることで初めて，変数や式がどういう種類のデータを持つのか分かる． <strong>その状態が「型が分かっている＝型付き」</strong> なのであって，注釈が書いてない・推論もできないのであれば「型が分からない＝型なし」である．</li>
+<li>そもそも型をつける対象は変数や式である．</li>
+<li>変数や式に型を付けるというのは，TypeScript コンパイラくんが自分でやらなければならない行為である．</li>
+<li><code>typeof</code> を使うと，「この範囲内ではこの型である」ことを TypeScript コンパイラに教えることができる．その正しさは，実行時に（JavaScript 的な意味での）型チェックを行うことで保証される（＝「動的な型付け」と言えなくもない？？）．</li>
+</ul>
+</li>
+</ul>
+<p>そして，Twitter（現・X）で頻繁に見かけるこの種の議論に対するわたしの意見は以下だ．</p>
+<ul>
+<li>「『動的型つき』の言語を『型なし』と呼ばない」派の人は，JavaScript プログラムくんの立場だ．
+<ul>
+<li>「型なし」という呼称に反対してもよい．</li>
+<li>しかし，その立場に立つのならば，<strong>そもそも「動的型付き」と呼ぶべきではない</strong>．</li>
+</ul>
+</li>
+<li>「『動的型つき』の言語を『型なし』と呼ぶ」派の人は，TypeScript コンパイラくんの立場だ．
+<ul>
+<li><code>any</code> 型が付いていても何もわからん，という意味で「型なし」と呼んでもいい．</li>
+<li>「動的型付き」って呼び方はおかしい！「型なし」のほうが適切だ！という意味で言っているなら，それでよい．</li>
+<li>「動的型付き」って「型なし」とも言えるよね，という意味で言っているなら，<strong>前提がなんだかおかしい．</strong></li>
+</ul>
+</li>
+<li><strong>一番中立なのは，「言語を『型なし』って呼ぶかは立場によるし，『動的型付き』って何？」派だ．</strong>
+<ul>
+<li>上の二つは両者ともに中立ではなく，それぞれの立場で <strong>ポジショントークをしている</strong> ことに気をつけろ！</li>
+<li>「動的型付け」という用語は，立場によらず<strong>使うべきではない！</strong></li>
+</ul>
+</li>
+</ul>
+<p>でも，それだと「静的型検査をしていないプログラム言語」を指す <strong>簡便で適切な用語が存在しない</strong> ことになってしんどいですよね？
+「動的型付け」と呼ぶと少なくとも「型なし」という用語を偉そうに否定できる立場ではなくなることを考えると，何か別な呼び方を考えたほうが良いんじゃないでしょうか<a id="fnref:7" href="#fn:7" class="footnote-ref"><sup>7</sup></a>．</p>
+<p>それが無理なら，<strong>中立の立場に立ったうえで，用語として適切でないのを許容して，伝わりやすさ重視で「動的型付け」と呼ぶ</strong>，というのが現実的ではないでしょうか．結局みんなそう呼んでるし．みんな中立的になってね<a id="fnref:8" href="#fn:8" class="footnote-ref"><sup>8</sup></a>．</p>
+<blockquote>
+<p>「静的」という語を明示的に付加することがある。例えば、「静的型付きプログラミング言語」という言い方をする。これは、本書で考察しているような種類のコンパイル時解析と、Scheme のような言語で使われる動的型付け（あるいは潜在的型付け）とを区別するためである。後者ではヒープ中の異なる種類の構造を区別するのに実行時の型タグが利用される。「動的型付けされる」といった言い回しは誤っているといって差し支えなく、おそらく「動的検査される」と言い換えるべきであるが、標準的に使われる用語法である。</p>
+<p>――― Benjamin C. Pierce 著，住井英二郎 監訳 『型システム入門』 一章より</p>
+</blockquote>
+<h2 id="section-5">おまけ: 「静的型付け」は実は「データの分類」以上の行為である</h2>
+<p>みなさん，中立的になりましたね？ では，以後は JavaScript 的な型付け（してないけど）のことを「動的型付け」，逆に TypeScript 的な型付けのことを「静的型付け」と呼ぶことにする．</p>
+<p>ところで，TypeScript を書いたことがあるかたはご存じかと思うが，TypeScript ではクラスに対してクラス型というものがつく．</p>
+<pre><code class="language-ts">// TypeScript
+class Point {
+  x: number;
+  y: number;
+
+  constructor(x: number, y: number) {
+    this.x = x; this.y = y;
+  }
+} 
+</code></pre>
+<p>このように <code>Point</code> というクラスを定義すると，<code>Point</code> という名前の型が作られ，<code>Point</code> クラスのインスタンスは <code>Point</code> 型を持つことになる．</p>
+<pre><code class="language-ts">// TypeScript
+
+function distance(p1: Point, p2: Point): number {
+  return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+}
+
+console.log(distance(new Point(1,1), new Point(2, 0)));
+</code></pre>
+<p>このように，<code>Point</code> クラスのインスタンスを2つ受け取って，点間の距離を返す関数 <code>distance</code> は，<code>Point</code> 型の引数を2つ取って，点間の距離を <code>number</code> で返す，という型を持つことになる．「変数 <code>p1, p2</code> が <code>Point</code> クラスのインスタンスである」ことと，「変数 <code>p1, p2</code> が <code>Point</code> 型を持つ」ということを同一視している，ということがわかるだろうか．</p>
+<p>また，何か別のクラス，例えば <code>Person</code> があったとして，<code>Person</code> クラスのインスタンスを <code>distance</code> に渡そうとしても TypeScript コンパイラ君が許さない．</p>
+<pre><code class="language-ts">// TypeScript
+
+class Person {
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+
+console.log(distance(new Point(0, 0), new Person(&quot;Alice&quot;)));
+// error: Argument of type 'Person' is not assignable to parameter of type 'Point'.
+</code></pre>
+<p>このように，<strong>TypeScript の静的型付けでは，違うクラスのインスタンス（を表す構文）は違う型を持つ</strong> とみなしていることがわかる．</p>
+<p>ところが，JavaScript の標準規格である <a href="https://262.ecma-international.org/14.0/">ECMAScript</a> では，データは以下の種類の型しか持たないことになっている．</p>
+<ul>
+<li><code>undefined</code></li>
+<li><code>null</code>
+<ul>
+<li>ただし，<code>typeof</code> すると <code>&quot;object&quot;</code> を返す．</li>
+</ul>
+</li>
+<li><code>boolean</code></li>
+<li><code>string</code></li>
+<li><code>symbol</code></li>
+<li><code>number</code></li>
+<li><code>bigint</code></li>
+<li><strong><code>object</code></strong>
+<ul>
+<li>関数は特殊なオブジェクト．ただし，<code>typeof</code> は <code>&quot;function&quot;</code> を返す．</li>
+<li>コンストラクタも特殊なオブジェクト．ただし，<code>typeof</code> は <code>&quot;function&quot;</code> を返す．</li>
+</ul>
+</li>
+</ul>
+<p>実際，JavaScript において <code>Point</code> クラスと <code>Person</code> クラスのインスタンスをそれぞれ作って，<code>typeof</code> をしてみると，両方とも <code>object</code> を返す．</p>
+<pre><code class="language-js">// JavaScript
+
+class Point {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+console.log(typeof (new Point(0, 0))); // &quot;object&quot;
+
+class Person {
+    constructor(name) {
+        this.name = name;
+    }
+}
+console.log(typeof (new Person(&quot;Alice&quot;))); // &quot;object&quot;
+</code></pre>
+<p>つまり，<strong>JavaScript の動的型付けでは，クラスのインスタンスは（違うクラスであっても）全て <code>object</code> 型を持つ</strong> ことがわかる．では JavaScript ではこの種の区別をどうやっているのかというと，それぞれのオブジェクトが「どのクラスのコンストラクタから作られたのか」を表す <strong>プロトタイプ（チェーン）</strong> というものを持っている．<code>instanceof</code> という演算子を使うことで，オブジェクトが実際にあるクラスのインスタンスなのかどうかを，オブジェクトのプロトタイプを見てチェックすることができる．</p>
+<pre><code class="language-js">// JavaScript
+function distance(p1, p2) {
+  if (!(p1 instanceof Point)) throw new Error(&quot;p1 is not a point.&quot;);
+  if (!(p2 instanceof Point)) throw new Error(&quot;p2 is not a point.&quot;);
+  return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+}
+</code></pre>
+<p>ここで <code>instanceof</code> の右辺に現れている <code>Point</code> はいわゆる「型」ではなく，<code>Point</code> クラスのコンストラクタ，つまりこちらもオブジェクトであることに注意しよう．つまり，JavaScript における <code>instanceof</code> は <strong>二つのオブジェクトの関係を調べる</strong> もので，それぞれのデータに最初から付いている型をチェックする動的型付けとは厳密には違う仕組みである．ちなみに，オブジェクトのプロトタイプはコンストラクタでインスタンスを作った瞬間に，つまり <em>実行時に設定される</em> ので，「動的に型っぽいものを付けている」という点で，むしろ <strong>こちらのほうこそ「動的型付け」と呼べなくもない</strong> のにも注意しよう．</p>
+<p>以上のことから，TypeScript の静的型付けは JavaScript の動的型付けよりも微妙に広い範囲を扱っていることがわかる．
+一般に<strong>静的型付けは，プログラム内で現れる不変条件全般を扱うことができる</strong>．不変条件とは「いつもそうである条件」という意味だ．
+TypeScript を例に取ると，</p>
+<ul>
+<li>「変数 <code>foo</code> が <code>string</code> 型を持つ」ことは，「<code>foo</code> に入るデータの種類は <code>string</code> である」という条件を保証する
+<ul>
+<li>つまり，<code>typeof foo</code> は <em>いつでも</em> <code>&quot;string&quot;</code> を返す</li>
+</ul>
+</li>
+<li>「変数 <code>bar</code> が <code>Point</code> 型を持つ」ことは，「<code>bar</code> に入るオブジェクトは <code>Point</code> クラスのインスタンスである」という条件を保証する
+<ul>
+<li>つまり，<code>bar instanceof Point</code> は <em>いつでも</em> <code>true</code> を返す</li>
+</ul>
+</li>
+</ul>
+<p>しかし，クラス型が保証する「インスタンスである」という条件も，結局「データの持つ属性」と言えなくもないのでは？と思う諸氏もいることだろう．では，ある変数 <code>baz</code> が持つ型が，<code>baz</code> 自身に入るデータの属性とは <em>もはや何の関係もない条件を保証する</em> 例を挙げれば，「不変条件全般を扱える」ということに納得していただけるだろうか？</p>
+<p>ここで，TypeScript で <code>typeof</code> を使う例を思い出してほしい．</p>
+<pre><code class="language-ts">// TypeScript
+function greet2(name: any) {
+  if (typeof name !== &quot;string&quot;) throw new Error(&quot;name is not a string&quot;);
+  return `Hello, ${name}!`;
+}
+</code></pre>
+<p>この例において，<code>`Hello, ${name}!`</code> の <code>name</code> の上にマウスカーソルを置くと <code>(parameter) name: string</code> と出てくるのは一体何故なのだろうか？ 実は，<code>if (typeof name !== &quot;string&quot;) throw ...</code> という文が，<code>if</code> 以下において <code>name</code> の型が <code>string</code> であることを保証しているのだ．これは，一旦別の関数に分割するとわかりやすい．</p>
+<pre><code class="language-ts">// TypeScript
+
+function isString(name: any): name is string {
+  return typeof name === &quot;string&quot;;
+}
+
+function greet2(name: any) {
+  const nameIsString = isString(name);
+
+  if (nameIsString) return `Hello, ${name}!`;
+  else throw new Error(&quot;name is not a string&quot;);
+}
+</code></pre>
+<p>上の例も <a href="https://www.typescriptlang.org/play?#code/GYVwdgxgLglg9mABDAzgZSgJxmA5gCgA8AuRAQzAE8BKUw5FRFLHXRAbwChFFMBTKCExIolAA584wRPQC88xACJm2PIoDcnAL6dOoSLASJc-AQCZ8YMgFs+pCjQ7dEEBM0RXbASXQs8iWQYMVQJPPmpNZxhpSxs+H2DWal4BISQAAwAJPgAbHLgAGkQAEnYwrQBCdM0eXJQ+RCgAC0w4AHcPPg6AUUxWzHxFMIYPOChyJj9cRQjtIA">TypeScript Playground</a> を用意してある．ここでも，<code>`Hello, ${name}!`</code> の <code>name</code> の上にマウスカーソルを置くと <code>(parameter) name: string</code> と出てくるのが確認できるだろう．何故こんなことができるのか？ それは，<code>isString</code> 関数の戻り値の型が <code>name is string</code> という珍妙な型を持っているからである．この型は文字通り，「<code>name</code> という変数が <code>string</code> 型を持っているかどうか」を表すもので，取りうる値は <code>true</code> もしくは <code>false</code> である．つまり，上の例では</p>
+<pre><code class="language-ts">const nameIsString = isString(name);
+</code></pre>
+<p>と結果を変数 <code>nameIsString</code> に代入しているが，ここで <code>isString</code> 関数の戻り値の型が <code>name is string</code> であることは，<strong>「もし <code>nameIsString</code> が <code>true</code> ならば，<code>name</code> の型は <code>string</code> である」</strong> ことを保証しているのだ！ これが保証されているからこそ，<code>if (nameIsString)</code> の中にある（＝ <code>nameIsString</code> が <code>true</code> であるケースの） <code>`Hello, ${name}!`</code> においては，<code>name</code> の型は <code>string</code> になっているのである．そして，<code>name is string</code> 型が保証している条件は <code>name</code> の型についてであって，<code>nameIsString</code> のデータの種類などは <em>もはやどうでもよくなっている</em> ことに注意してほしい．</p>
+<p>以上の内容をまとめよう．</p>
+<ul>
+<li><strong>静的型付けは，プログラム内で現れる不変条件全般を扱うことができる</strong>
+<ul>
+<li>「データの種類」（＝ <code>typeof</code> の結果）は，あくまで静的型付けで扱える不変条件の一つに過ぎない</li>
+<li>クラス型は，「特定の <code>class</code> のインスタンスである（≒ <code>instanceof</code> が <code>true</code> になる）」という不変条件である
+<ul>
+<li>JavaScript 的には全て同じ <code>object</code> 型のデータであり，<code>typeof</code> では区別できない</li>
+<li>JavaScript におけるプロトタイプは，データの持つ「型」とは厳密には違う仕組みである</li>
+</ul>
+</li>
+<li><code>x is string</code> 型が保証する不変条件は，もはや自分自身のデータの種類とは関係ない
+<ul>
+<li><code>x is string</code> 型を返す関数が実際に返すデータは <code>true</code> か <code>false</code> である</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>JavaScript におけるプロトタイプは，実行時にタグ付けされるという点では，動的に型付けしていると言えなくもない
+<ul>
+<li>ただし仕様上では，厳密には「型」とは違う仕組みである</li>
+</ul>
+</li>
+</ul>
+<p>ちなみに，わたしが文中で</p>
+<blockquote>
+<blockquote>
+<p>「型」とは，プログラム内で扱うデータを分類するものである</p>
+</blockquote>
+<p>これに同意できないひとは，申し訳ないが回れ右してほしい．わたしには君を救うことはできない……</p>
+</blockquote>
+<p>や，</p>
+<blockquote>
+<pre><code class="language-ts">// TypeScript
+function greet(name) {
+  return `Hello, ${name}!`;
+}
+</code></pre>
+<p>このコードに「型がついてない」ことに同意できない人も，わたしには救えないので，回れ右してほしい．</p>
+</blockquote>
+<p>と言ったのは，このおまけで解説した内容を理解している人には釈迦に説法であって，
+なおかつ「データの種類」としての「型」の用法を頑なに認めないような人は，
+ガチガチの静的型付け原理主義者で救いようがない，ということです……</p>
+<h2 id="section-6">おまけのおまけ: 「型推論」と「動的型付け」の混同について</h2>
+<p>以上の話がきちんと分かっていれば，TypeScript で</p>
+<pre><code class="language-ts">// TypeScript
+const x = &quot;foo&quot;;
+</code></pre>
+<p>と書くと <code>x</code> の型が <code>string</code> になるといった，いわゆる「型推論」と，
+JavaScript で</p>
+<pre><code class="language-js">// JavaScript
+const x = &quot;foo&quot;;
+</code></pre>
+<p>と型を指定せずに書ける，いわゆる「動的型付け」（という呼び方はオカシイと散々言ってるが）を，混同する <strong>わけがない</strong> のである．TypeScript コンパイラくんは型推論を頑張ったので，変数 <code>x</code> の型が <code>string</code> であることをキチンと知っているし，それこそが彼にとって大事なことだ．一方 JavaScript プログラムくん的には， <code>&quot;foo&quot;</code> というデータは生まれた時から <code>string</code> なのであって，それが入ってる変数 <code>x</code> の型なんてものは知ったことではないのである．</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn:1">
+<p>観測範囲では三回目．いい加減にしろ！<a href="#fnref:1" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>型注釈を書くでも，型推論してもらうでも，なんでもよいので<a href="#fnref:2" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>データの分類としての「型」にプログラムが干渉する余地はないということ．<code>typeof</code> を自分で実装したり，<code>typeof foo === &quot;hogehoge&quot;</code> になるような <code>foo</code> なり <code>hogehoge</code> を作ったりするのは不可能，と言ってもいい<a href="#fnref:3" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:4">
+<p>実は先ほどの例では，TypeScript コンパイラくんは「型注釈を（<code>: any</code> すらも）<strong>明示的に書いていないこと</strong>」に怒っている．嘘ついてごめん…… また，明示的に <code>any</code> を書く行為も ESLint で禁止できる<a href="#fnref:4" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:5">
+<p>これは，<code>greet</code> が文字列を <code>return</code> することから TypeScript コンパイラが推論してくれている<a href="#fnref:5" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:6">
+<p><a href="https://www.ohmsha.co.jp/book/9784274069116/">オーム社ウェブサイトの書籍ページ</a> からダウンロードできるサンプルで確認できる一文だ<a href="#fnref:6" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:7">
+<p>「動的型検査言語」はどうだろうか<a href="#fnref:7" class="footnote-back-ref">&#8617;</a></p>
+</li>
+<li id="fn:8">
+<p>なお，静的型付けにも Church-style と Curry-style の二つの派閥が存在するが， Church-style 主義者に「型って何？」って聞くと「『型』とは『項』ッ！！」と返ってきて話がどんどんややこしくなるので，今回の記事では割愛する<a href="#fnref:8" class="footnote-back-ref">&#8617;</a></p>
+</li>
+</ol>
+</div>
+
+    </section>
+    <hr />
+    <section>
+      <script src="https://utteranc.es/client.js"
+              repo="cannorin/cannorin.github.io"
+              branch="master"
+              issue-term="title"
+              async>
+      </script>
+    </section> 
+
+    <footer class="post-footer">
+      <section class="share">
+        <h4>Share</h4>
+        <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=%E3%80%8C%E5%8B%95%E7%9A%84%E5%9E%8B%E3%81%A4%E3%81%8D%E3%80%8D%E3%81%AE%E8%A8%80%E8%AA%9E%E3%82%92%E3%80%8C%E5%9E%8B%E3%81%AA%E3%81%97%E3%80%8D%E3%81%A8%E5%91%BC%E3%81%B6%E3%81%AE%E3%81%AF%E3%81%8A%E3%81%8B%E3%81%97%E3%81%84%EF%BC%8C%E3%81%AE%E3%81%8B%EF%BC%9F%20-%20SevenColoured"
+           onclick="window.open(this.href+' '+window.location.href, 'twitter-share', 'width=550,height=235');return false;">
+          <span class="hidden">Twitter</span>
+        </a>
+        <a href="https://mastoshare.net/post.php?text=%E3%80%8C%E5%8B%95%E7%9A%84%E5%9E%8B%E3%81%A4%E3%81%8D%E3%80%8D%E3%81%AE%E8%A8%80%E8%AA%9E%E3%82%92%E3%80%8C%E5%9E%8B%E3%81%AA%E3%81%97%E3%80%8D%E3%81%A8%E5%91%BC%E3%81%B6%E3%81%AE%E3%81%AF%E3%81%8A%E3%81%8B%E3%81%97%E3%81%84%EF%BC%8C%E3%81%AE%E3%81%8B%EF%BC%9F%20-%20SevenColoured" onclick="window.open(this.href+' '+window.location.href, '', 'width=500,height=400'); return false;"><img src="https://mastoshare.net/img/toot.svg" width="75" height="20"></a>
+      </section>
+    </footer>
+
+    &nbsp;
+  </article>
+</main>
+
+<aside class="read-next">
+  <a class="read-next-story prev" href="https://7colou.red/blog/2022/wakate.html">
+    <section class="post">
+      <h2> 情報科学若手の会2022に参加した </h2>
+      <section class="post-excerpt">
+        ブログエントリを書くまでが若手の会
+      </section>
+    </section>
+  </a>
+</aside>
+
+  </div>
+
+  <footer class="site-footer clearfix">
+    <section class="copyright">
+      <p>
+        Articles are licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> (unless explicitly mentioned)
+      </p>
+      <p>
+        Code examples are licensed under the <a href="https://directory.fsf.org/wiki/License:Expat">Expat(MIT) license</a>.
+      </p>
+      <p style="text-align:left;margin-top:10px;"><img src="https://7colou.red/img/by-sa.png" alt="CC BY-SA 3.0"/></p>
+    </section>
+    <section class="poweredby">
+      <p>
+        This site is powered by <a href="https://github.com/cannorin/flxble">Flxble</a>,
+        and <a href="https://7colou.red/blog/2019/flxble.html">it's my own blog engine!</a>
+      </p>
+    </section>
+  </footer>
+
+  <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/jquery.fitvids.js"></script>
+  <script type="text/javascript" src="https://7colou.red/js/index.js"></script>
+
+</body>
+</html>
