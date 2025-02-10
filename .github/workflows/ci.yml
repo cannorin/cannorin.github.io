@@ -15,7 +15,7 @@ jobs:
         os:
           - ubuntu-latest
         dotnet:
-          - 8.0
+          - 2.1.x
 
     runs-on: ${{ matrix.os }}
 
@@ -30,9 +30,14 @@ jobs:
 
       - name: Install flxble
         run: dotnet tool restore
+        env:
+          DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: 1
 
       - name: Build blog
         run: dotnet flxble render-blog -l trace
+        env:
+          DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: 1
+
 
       - name: Push output to the output branch
         if: success()
