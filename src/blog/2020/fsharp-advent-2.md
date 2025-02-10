@@ -4,6 +4,7 @@ title = 'FSharpPlus に型安全な固定長リストが実装されるまでの
 description = 'SRTP と型プロバイダを使った黒魔術が盛りだくさんです'
 post_date = 2020-12-25T00:00:00.0000000+09:00
 tags = ["F#", "advent", "type system"]
+redirect_to = "https://www.cannorin.net/blog/2020-12-25-fsp-vector"
 ---
 
 この記事は [F# Advent Calendar 2020](https://qiita.com/advent-calendar/2020/fsharp) の25日目の記事です．

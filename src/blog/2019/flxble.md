@@ -4,6 +4,7 @@ title = 'ブログエンジンを自作した'
 description = '静的サイトジェネレータ flxble を自作して, ウェブサイトをそれに移行した.'
 post_date = 2019-01-16T10:41:45.6672030+09:00
 tags = ["F#", "misc", "dev"]
+redirect_to = "https://www.cannorin.net/blog/2019-01-16-flxble"
 ---
 
 静的サイトジェネレータ [flxble](https://github.com/cannorin/flxble) を自作して, ウェブサイトをそれに移行した.

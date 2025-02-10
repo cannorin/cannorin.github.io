@@ -4,6 +4,7 @@
   post_date = 2018-07-07T05:42:46+09:00
   tags = ["type system", "type theory"]
   description = "Dependent Types (依存型) と Refinement Types (篩型) は目指すところは似ているが, 導入スタイルに根本的な違いがある."
+  redirect_to = "https://www.cannorin.net/blog/2018-07-07-difference"
 ---
 
 自分の tweets.zip をみてたら発掘された文章.

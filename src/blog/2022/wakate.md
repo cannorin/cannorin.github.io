@@ -4,6 +4,7 @@ title = '情報科学若手の会2022に参加した'
 description = 'ブログエントリを書くまでが若手の会'
 post_date = 2022-09-26T15:00:00.0000000+09:00
 tags = ["misc"]
+redirect_to = "https://www.cannorin.net/blog/2022-09-26-wakate"
 ---
 
 第55回[情報科学若手の会](https://wakate.org/)に参加してました．

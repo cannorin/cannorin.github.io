@@ -4,6 +4,7 @@ title = '[Qiita] 任意長のタプルをサポートする SRTP 制約の書き
 description = 'あんまり一般受けするようなネタが思いつかなかったので，SRTP をゴリゴリ書いてる人向けの記事になってしまいました．ごめんなさい……'
 post_date = 2019-12-25T00:00:00.0000000+09:00
 tags = ["F#", "advent", "qiita"]
+redirect_to = "https://www.cannorin.net/blog/2019-12-25-tuple-srtp"
 ---
 
 > この記事は [以前 Qiita に投稿した記事](https://qiita.com/cannorin/items/aaf6abb2a7c1bc7793d4) の転載です．

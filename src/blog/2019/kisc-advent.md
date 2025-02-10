@@ -4,6 +4,7 @@ title = '部室 Wi-Fi を支える技術'
 description = '認証コンセントはクソ'
 post_date = 2019-12-22T00:00:00.0000000+09:00
 tags = ["misc", "advent"]
+redirect_to = "https://www.cannorin.net/blog/2019-12-22-kisc-advent.md"
 ---
 
 この記事は [Kobe University Advent Calendar 2019](https://adventar.org/calendars/4690) の22日目です．

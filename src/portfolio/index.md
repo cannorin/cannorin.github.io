@@ -1,6 +1,7 @@
 ---
   type = "portfolio"
   title = "Portfolio"
+  redirect_to = "https://www.cannorin.net/"
 ---
 
 ![](./jakeko.png)

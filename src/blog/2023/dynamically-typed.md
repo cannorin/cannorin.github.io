@@ -4,6 +4,7 @@
   description = 'Twitter（現・X）でのこの種の定期イベントはそろそろやめにしないか'
   post_date = 2023-08-19T16:15:00+09:00
   tags = ["type system", "type theory"]
+  redirect_to = "https://www.cannorin.net/blog/2023-08-19-dynamically-typed"
 ---
 
 ある日の Twitter （現・X）のタイムライン．

@@ -1,5 +1,6 @@
 ---
   type = "page"
+  redirect_to = "https://www.cannorin.net/"
 ---
 
 Ｉ＇ｍ　ｒｅａｌ，　Ｉ＇ｍ　ｈｅｒｅ．
